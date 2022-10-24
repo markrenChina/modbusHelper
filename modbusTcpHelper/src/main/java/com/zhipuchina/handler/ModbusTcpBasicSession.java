@@ -8,10 +8,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 
-public class ModbusTcpBasicSession extends Thread {
+public class ModbusTcpBasicSession implements Runnable {
     private final Socket socket;
     private InputStream in = null;
     private OutputStream out = null;
+
     public ModbusTcpBasicSession(Socket socket) {
         this.socket = socket;
     }
@@ -29,11 +30,13 @@ public class ModbusTcpBasicSession extends Thread {
         functionControllers[16] = new SixteenFunctionController();
     }
 
-    public static void changeFunctionController(Class<? extends FunctionController> type,FunctionController function){
+    //todo 切换functionController
+    public static void changeFunctionController(Class<? extends FunctionController> type, FunctionController function) {
 
     }
 
-    protected void testHook(){};
+    protected void testHook() {
+    };
 
     @Override
     public void run() {
@@ -45,27 +48,27 @@ public class ModbusTcpBasicSession extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        while (!interrupted()){
-            try {
+        try {
+            while (!socket.isClosed()) {
                 int readLen = in.readNBytes(header, 0, 7);
                 if (readLen != 7) {
                     close();
                     break;
                 }
-                int transActionId = ((header[0] & 0xFF) << 8 ) | header[1];
+                int transActionId = ((header[0] & 0xFF) << 8) | header[1];
                 GlobalLogger.logger.debug("transActionId " + transActionId);
-                int protocal = ((header[2]& 0xFF) << 8) | header[3];
+                int protocal = ((header[2] & 0xFF) << 8) | header[3];
                 GlobalLogger.logger.debug("protocal " + protocal);
                 if (protocal != 0) {
                     System.err.println("protocal != 0 close accept");
                     close();
                     break;
                 }
-                int frameLen = ((header[4] & 0xFF)<< 8 ) | header[5];
+                int frameLen = ((header[4] & 0xFF) << 8) | header[5];
                 GlobalLogger.logger.debug("frameLen " + frameLen);
-                ADU = new byte[frameLen-1];
-                int len = in.readNBytes(ADU, 0, frameLen-1);
-                if (len != frameLen -1){
+                ADU = new byte[frameLen - 1];
+                int len = in.readNBytes(ADU, 0, frameLen - 1);
+                if (len != frameLen - 1) {
                     System.err.println("len != frameLen close accept ");
                     close();
                     break;
@@ -81,32 +84,33 @@ public class ModbusTcpBasicSession extends Thread {
                 //outValue[4] outValue[5] 写长度
                 int outLen = outValue.length - 6;
                 outValue[5] = (byte) (outLen & 0xFF);
-                outValue[4] = (byte)((outLen >> 8) & 0xFF);
-                System.arraycopy(header,0,outValue,0,4);
+                outValue[4] = (byte) ((outLen >> 8) & 0xFF);
+                System.arraycopy(header, 0, outValue, 0, 4);
                 out.write(outValue);
                 ADU = null;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
+        } catch (Exception e) {
+            close();
+            throw new RuntimeException(e);
         }
     }
 
-    private void close(){
-        if (in != null){
+    private void close() {
+        if (in != null) {
             try {
                 in.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        if (out != null){
+        if (out != null) {
             try {
                 out.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        if (socket != null){
+        if (socket != null) {
             try {
                 socket.close();
             } catch (IOException e) {

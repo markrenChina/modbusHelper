@@ -28,7 +28,7 @@ public class OneFunctionHandler implements FunctionController {
                 pos++;
             }
             boolean now = Boolean.parseBoolean(Buffer.getValue(MemoryTypes.OutputCoil,address + i).toString());
-            GlobalLogger.logger.debug("===========> now "  + now);
+//            GlobalLogger.logger.debug("===========> now "  + now);
             int tmp =  0x01;
             for (int j = 0; j < i%8; j++) {
                 tmp = tmp << 1;

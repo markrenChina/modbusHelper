@@ -9,6 +9,7 @@ public enum MemoryTypes {
     private int code;
 
     MemoryTypes(int i) {
+        this.code = i;
     }
 
     public int getCode() {

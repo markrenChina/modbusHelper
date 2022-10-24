@@ -9,6 +9,6 @@ public class MySessionFactory implements SessionFactory {
 
     @Override
     public ModbusTcpBasicSession accept(Socket socket) {
-        return new MyModbusTcpSeesion(socket);
+        return new MyModbusTcpSession(socket);
     }
 }

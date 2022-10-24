@@ -4,8 +4,8 @@ import com.zhipuchina.handler.ModbusTcpBasicSession;
 
 import java.net.Socket;
 
-public class MyModbusTcpSeesion extends ModbusTcpBasicSession {
-    public MyModbusTcpSeesion(Socket socket) {
+public class MyModbusTcpSession extends ModbusTcpBasicSession {
+    public MyModbusTcpSession(Socket socket) {
         super(socket);
     }
 

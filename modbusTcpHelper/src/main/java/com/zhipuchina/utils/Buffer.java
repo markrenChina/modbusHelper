@@ -1,7 +1,10 @@
 package com.zhipuchina.utils;
 
+import com.zhipuchina.event.AfterEventHandler;
+import com.zhipuchina.event.BeforeEventHandler;
 import com.zhipuchina.event.EventHandler;
 import com.zhipuchina.event.EventManager;
+import com.zhipuchina.exec.ModbusExecutors;
 import com.zhipuchina.model.*;
 
 import java.util.ArrayList;
@@ -59,19 +62,28 @@ public class Buffer {
         setValue(MemoryTypes.code2MemoryTypes( pos / 10000),pos%10000,val);
     }
     public static void setValue(MemoryTypes type, int offset,Object val) {
-        EventHandler event = EventManager.getEvent(type, offset);
-        //todo 异步回调
-        if (event != null){
-            event.beforeProcess(getValue(type,offset),val);
+        BeforeEventHandler aEvent = EventManager.getBeforeEvent(type, offset);
+        Object oldValue = null;
+        if (aEvent != null){
+            oldValue = getValue(type, offset);
+            aEvent.process(getValue(type,offset),val);
+        }
+        List<AfterEventHandler> events = EventManager.getAfterEvent(type, offset);
+        if (events != null && oldValue == null){
+            oldValue = getValue(type, offset);
         }
         if (type == MemoryTypes.OutputCoil) {
             outputCoilBuffer.get(offset).setValue(Boolean.valueOf(val.toString()));
         } else {
             outputRegisterBuffer.get(offset).setValue(Short.parseShort(val.toString()) );
         }
-        //todo 异步回调
-        if (event != null){
-            event.afterProcess(getValue(type,offset),val);
+        final Object finalOldValue = oldValue;
+        if (events != null){
+            for (AfterEventHandler event : events) {
+                ModbusExecutors.exec(() -> {
+                    event.process(finalOldValue,val);
+                });
+            }
         }
     }
 

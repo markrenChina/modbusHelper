@@ -4,7 +4,7 @@
 
   <groupId>com.zhipuchina</groupId>
   <artifactId>modbusTcpHelper</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-dev</version>
   <packaging>jar</packaging>
 
   <name>modbusTcpHelper</name>
@@ -23,4 +23,34 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <attach>true</attach>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
+    <repository>
+      <id>test-server-maven-public</id>
+      <name>maven-releases</name>
+      <url>http://cloud.cpnir.com:8081/repository/maven-releases/</url>
+    </repository>
+  </distributionManagement>
+
 </project>
