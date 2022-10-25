@@ -3,5 +3,5 @@ package com.zhipuchina.function;
 @FunctionalInterface
 public interface FunctionController {
 
-    public byte[] serve(byte[] ADU);
+    public byte[] serve(byte[] header,byte[] ADU);
 }

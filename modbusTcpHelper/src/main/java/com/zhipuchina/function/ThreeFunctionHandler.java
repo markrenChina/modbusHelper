@@ -12,7 +12,7 @@ public class ThreeFunctionHandler implements FunctionController{
      * @return 一个数组，包含功能码及之后的数据
      */
     @Override
-    public byte[] serve(byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU) {
         int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
         int count = (ADU[3] << 8) | (ADU[4]& 0xFF);
         int outCount = count << 1;

@@ -1,9 +1,8 @@
 package com.zhipuchina.function;
 
-public class TwoFunctionHandler implements FunctionController{
+public class FourFunctionHandler implements FunctionController{
 
-    FunctionController functionController = new OneFunctionHandler();
-
+    FunctionController functionController = new ThreeFunctionHandler();
     @Override
     public byte[] serve(byte[] header,byte[] ADU) {
         return functionController.serve(header,ADU);

@@ -8,7 +8,7 @@ import com.zhipuchina.utils.Buffer;
 
 public class FiveFunctionController implements FunctionController{
     @Override
-    public byte[] serve(byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU) {
         int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
         GlobalLogger.logger.debug("address "+ address);
         boolean value = (ADU[3] >> 7) != 0;

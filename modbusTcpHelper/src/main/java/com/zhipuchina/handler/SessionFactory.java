@@ -1,10 +1,11 @@
 package com.zhipuchina.handler;
 
+import com.zhipuchina.function.FunctionController;
+import com.zhipuchina.utils.FunctionControllerUtil;
+
 import java.net.Socket;
 
 public interface SessionFactory {
 
-    default public ModbusTcpBasicSession accept(Socket socket){
-        return new ModbusTcpBasicSession(socket);
-    }
+    public ModbusTcpBasicSession accept(Socket socket);
 }

@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public class SixteenFunctionController implements FunctionController{
     @Override
-    public byte[] serve(byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU) {
         //地址
         int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
         //寄存器数量

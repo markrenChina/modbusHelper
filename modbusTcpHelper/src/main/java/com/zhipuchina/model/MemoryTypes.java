@@ -24,4 +24,23 @@ public enum MemoryTypes {
         }
         throw new RuntimeException("null MemoryType");
     }
+
+    public static int type2functionCode(MemoryTypes type) {
+        int functionCode = 0;
+        switch (type){
+            case OutputCoil:
+                functionCode = 1;
+                break;
+            case InputCoil:
+                functionCode = 2;
+                break;
+            case OutputRegister:
+                functionCode = 4;
+                break;
+            case InputRegister:
+                functionCode = 3;
+                break;
+        }
+        return functionCode;
+    }
 }

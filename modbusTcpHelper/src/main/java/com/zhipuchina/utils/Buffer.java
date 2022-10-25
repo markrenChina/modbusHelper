@@ -19,7 +19,7 @@ public class Buffer {
 
     //TODO 支持从中间开始开辟
     public static void malloc(int startPos, int size) {
-        malloc(MemoryTypes.code2MemoryTypes( startPos / 10000),size);
+        malloc(MemoryTypes.code2MemoryTypes(startPos / 10000), size);
     }
 
     public static void malloc(MemoryTypes type, int size) {
@@ -43,8 +43,9 @@ public class Buffer {
     }
 
     public static Object getValue(int pos) {
-        return getValue(MemoryTypes.code2MemoryTypes( pos / 10000),pos%10000);
+        return getValue(MemoryTypes.code2MemoryTypes(pos / 10000), pos % 10000);
     }
+
     public static Object getValue(MemoryTypes type, int offset) {
         if (type == MemoryTypes.InputCoil) {
             return inputCoilBuffer.get(offset).getValue();
@@ -58,68 +59,69 @@ public class Buffer {
     }
 
 
-    public static void setValue(int pos,Object val) {
-        setValue(MemoryTypes.code2MemoryTypes( pos / 10000),pos%10000,val);
+    public static void setValue(int pos, Object val) {
+        setValue(MemoryTypes.code2MemoryTypes(pos / 10000), pos % 10000, val);
     }
-    public static void setValue(MemoryTypes type, int offset,Object val) {
+
+    public static void setValue(MemoryTypes type, int offset, Object val) {
         BeforeEventHandler aEvent = EventManager.getBeforeEvent(type, offset);
         Object oldValue = null;
-        if (aEvent != null){
+        if (aEvent != null) {
             oldValue = getValue(type, offset);
-            aEvent.process(getValue(type,offset),val);
+            aEvent.process(getValue(type, offset), val);
         }
         List<AfterEventHandler> events = EventManager.getAfterEvent(type, offset);
-        if (events != null && oldValue == null){
+        if (events != null && oldValue == null) {
             oldValue = getValue(type, offset);
         }
         if (type == MemoryTypes.OutputCoil) {
             outputCoilBuffer.get(offset).setValue(Boolean.valueOf(val.toString()));
         } else {
-            outputRegisterBuffer.get(offset).setValue(Short.parseShort(val.toString()) );
+            outputRegisterBuffer.get(offset).setValue(Short.parseShort(val.toString()));
         }
         final Object finalOldValue = oldValue;
-        if (events != null){
-            for (AfterEventHandler event : events) {
-                ModbusExecutors.exec(() -> {
-                    event.process(finalOldValue,val);
-                });
-            }
+        if (events != null) {
+            ModbusExecutors.exec(() -> {
+                for (AfterEventHandler event : events) {
+                    event.process(finalOldValue, val);
+                }
+            });
         }
     }
 
-    public static String getString(Class<? extends Register> type,int offset,int length) {
+    public static String getString(Class<? extends Register> type, int offset, int length) {
         StringBuilder sb = new StringBuilder(length);
-        if (type == InputRegister.class){
+        if (type == InputRegister.class) {
             for (int i = 0; i < length; i++) {
-                Object obj= inputRegisterBuffer.get(offset + i).getValue();
+                Object obj = inputRegisterBuffer.get(offset + i).getValue();
                 int now = Integer.parseInt(obj.toString());
                 int hByte = (now >> 8) & 0xFF;
                 int lByte = now & 0xFF;
-                if (hByte != 0){
+                if (hByte != 0) {
                     sb.append((char) hByte);
-                }else {
+                } else {
                     break;
                 }
-                if (lByte != 0){
+                if (lByte != 0) {
                     sb.append((char) lByte);
-                }else {
+                } else {
                     break;
                 }
             }
-        } else  {
+        } else {
             for (int i = 0; i < length; i++) {
-                Object obj= outputRegisterBuffer.get(offset + i).getValue();
+                Object obj = outputRegisterBuffer.get(offset + i).getValue();
                 int now = Integer.parseInt(obj.toString());
                 int hByte = (now >> 8) & 0xFF;
                 int lByte = now & 0xFF;
-                if (hByte != 0){
+                if (hByte != 0) {
                     sb.append((char) hByte);
-                }else {
+                } else {
                     break;
                 }
-                if (lByte != 0){
+                if (lByte != 0) {
                     sb.append((char) lByte);
-                }else {
+                } else {
                     break;
                 }
             }
@@ -127,15 +129,15 @@ public class Buffer {
         return sb.toString();
     }
 
-    public static void setString(int offset,String val) {
-        for (int i = 0; i*2 < val.length(); i++) {
-            char hChar= val.charAt(i * 2);
+    public static void setString(int offset, String val) {
+        for (int i = 0; i * 2 < val.length(); i++) {
+            char hChar = val.charAt(i * 2);
             int v = hChar << 8;
-            if (i *2 +1 < val.length()){
-                char lChar = val.charAt(i*2+1);
-                v+= lChar;
+            if (i * 2 + 1 < val.length()) {
+                char lChar = val.charAt(i * 2 + 1);
+                v += lChar;
             }
-            outputRegisterBuffer.get(offset+i).setValue((short)v);
+            outputRegisterBuffer.get(offset + i).setValue((short) v);
         }
     }
 }
