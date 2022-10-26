@@ -22,14 +22,14 @@ public class FunctionControllerUtil {
     public static FunctionController createDefaultClientFunctionController(int functionCode){
         FunctionController functionController = null;
         switch (functionCode){
-            case 1: functionController = new OneFunctionHandler();break;
-            case 2: functionController = new TwoFunctionHandler();break;
+//            case 1: functionController = new OneFunctionHandler();break;
+//            case 2: functionController = new TwoFunctionHandler();break;
             case 3: functionController = new ThreeClientFunctionHandler();break;
-            case 4: functionController = new FourFunctionHandler();break;
-            case 5: functionController = new FiveFunctionController();break;
-            case 6: functionController = new SixFunctionController();break;
-            case 15: functionController = new FifteenFunctionHandler();break;
-            case 16: functionController = new SixteenFunctionController();break;
+//            case 4: functionController = new FourFunctionHandler();break;
+//            case 5: functionController = new FiveFunctionController();break;
+//            case 6: functionController = new SixFunctionController();break;
+//            case 15: functionController = new FifteenFunctionHandler();break;
+//            case 16: functionController = new SixteenFunctionController();break;
         }
         return functionController;
     }

@@ -29,10 +29,10 @@ public class App
     }
 
     public static void testServer() throws UnknownHostException {
-        Buffer.malloc(MemoryTypes.InputCoil,1000);
-        Buffer.malloc(MemoryTypes.OutputCoil,1000);
-        Buffer.malloc(MemoryTypes.OutputRegister,50);
-        Buffer.malloc(MemoryTypes.InputRegister,200);
+        Buffer.malloc(MemoryTypes.InputCoil,0,1000);
+        Buffer.malloc(MemoryTypes.OutputCoil,0,1000);
+        Buffer.malloc(MemoryTypes.OutputRegister,0,50);
+        Buffer.malloc(MemoryTypes.InputRegister,0,200);
         System.out.println(MemoryTypes.code2MemoryTypes(4));
         EventManager.register(MemoryTypes.OutputRegister, 0, new ChangeEventHandler(0,1,()->System.err.println("0 改成了 1")));
         EventManager.register(MemoryTypes.OutputRegister, 0, new ChangeEventHandler(1,2,()->System.err.println("1 改成了 2")));
@@ -52,6 +52,6 @@ public class App
 
     public static void main( String[] args ) throws UnknownHostException {
        testServer();
-       testClient();
+       //testClient();
     }
 }

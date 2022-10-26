@@ -24,12 +24,12 @@ public class FifteenFunctionHandler implements FunctionController{
         int count = (ADU[3] << 8) | (ADU[4]& 0xFF);
         byte[] out = new byte[12];
         for (int i = 0; i < count; i++) {
-            int tmp = ADU[6];
-            for (int j = 0; j < 8 - i; j++) {
-                tmp |= tmp >> 1;
-            }
-            boolean value = (tmp & 0x01) == 1;
-            Buffer.setValue(MemoryTypes.OutputCoil,address+i,value);
+//            int tmp = ADU[6];
+//            for (int j = 0; j < 8 - i; j++) {
+//                tmp |= tmp >> 1;
+//            }
+//            boolean value = (tmp & 0x01) == 1;
+//            Buffer.setValue(MemoryTypes.OutputCoil,address+i,value);
         }
         System.arraycopy(ADU,0,out,7,5);
         return out;
