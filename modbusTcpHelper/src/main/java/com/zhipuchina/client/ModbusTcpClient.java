@@ -1,32 +1,42 @@
 package com.zhipuchina.client;
 
+import com.zhipuchina.annotation.WorkThread;
 import com.zhipuchina.exec.ModbusExecutors;
 import com.zhipuchina.handler.*;
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.utils.BitUtil;
-import com.zhipuchina.utils.Pair;
+import com.zhipuchina.pojo.Exchange;
+import com.zhipuchina.utils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.SocketAddress;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 
 /**
  * 0~ 55534 由定时器使用
  * 55535 ~ 65535 主动发送
  */
-public class ModbusTcpClient extends TcpClient{
+public class ModbusTcpClient extends TcpClient {
 
     //private final ModbusTcpBasicSession basicSession;
-    private OutputStream out;
-    private InputStream in;
-    private final int slaveId;
-    private ModbusTcpBasicSession session;
 
-    private final LinkedList<Pair<Integer,List<Object>>> list = new LinkedList<>();
+    private final ModbusTcpBasicSession session;
+
+    public ModbusTcpClient(
+            SocketAddress remoteAddress,
+            ModbusSyncTimer task,
+            SocketAddress localAddress,
+            SessionFactory factory
+    ){
+        super(remoteAddress, localAddress);
+        this.session = factory.accept(socket);
+        if (task != null) {
+            task.setSession(session);
+            ModbusExecutors.exec(task);
+        }
+        start();
+    }
 
     public ModbusTcpClient(
             SocketAddress remoteAddress,
@@ -34,96 +44,119 @@ public class ModbusTcpClient extends TcpClient{
             ModbusSyncTimer task,
             SocketAddress localAddress
     ) {
-        super(remoteAddress, localAddress);
-        this.session = new DefaultClientSessionFactoryImp().accept(socket);
-        this.slaveId = Objects.requireNonNullElse(slaveId, 0);
-        try {
-            out = socket.getOutputStream();
-            in = socket.getInputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (task!=null){
-            task.setOutputStream(out);
-            ModbusExecutors.exec(task);
-        }
-        start();
+        this(remoteAddress,task,localAddress,new DefaultClientSessionFactoryImp(slaveId));
     }
 
-    public Object read(MemoryTypes type ,int offset){
+    //todo 测试
+    @WorkThread
+    public Object read(MemoryTypes type, int offset) {
         return readV(type, offset, 1).get(0);
     }
 
+
     //todo
-    public boolean write(MemoryTypes type,int offset,Object val){
-        byte[] ADU = new byte[10];
-        send(ADU);
+    @WorkThread
+    public boolean write(MemoryTypes type, int offset, Object val) {
+        int functionCode = MemoryTypes.type2writeFunctionCode(type);
+        byte[] value = ConvertTo.primitive(val);
+        byte[] ADU = new byte[]{
+                BitUtil.getInt0To8(functionCode),
+                BitUtil.getInt8To16(offset),
+                BitUtil.getInt0To8(offset),
+                value[0],
+                value[1]
+        };
+        CountDownLatch latch = new CountDownLatch(1);
+        int id = session.send(ADU,1, latch);
+        GlobalLogger.logger.debug("send finish");
+        //去判断有回复再返回true 没回复 返回false
         return true;
+//        try {
+//            latch.await();
+//            return (boolean) getRes(id).get(0);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
-    public List<Object> readV(MemoryTypes type,int startAddress ,int count){
+    @WorkThread
+    public List<Object> readV(MemoryTypes type, int startAddress, int count) {
         CountDownLatch latch = new CountDownLatch(1);
         byte[] ADU = new byte[5];
-        ADU[0] = (byte) MemoryTypes.type2functionCode(type);
+        ADU[0] = (byte) MemoryTypes.type2readFunctionCode(type);
         ADU[1] = BitUtil.getInt8To16(startAddress);
         ADU[2] = BitUtil.getInt0To8(startAddress);
         ADU[3] = BitUtil.getInt8To16(count);
         ADU[4] = BitUtil.getInt0To8(count);
         //send 异步
-        int id = send(ADU);
+        int id = session.send(ADU,count,latch);
         //latch.countDown();
         try {
             latch.await();
             //await 异步回调
-            List<Object> res = null;
-            Iterator<Pair<Integer,List<Object>>> it = list.iterator();
-            while (it.hasNext()){
-                Pair<Integer, List<Object>> next = it.next();
-                if (next.getFirst() == id){
-                    res = next.getSecond();
-                    it.remove();
-                    break;
-                }
-            }
-            return res;
+            return getRes(id);
         } catch (InterruptedException e) {
             GlobalLogger.logger.error(e.getLocalizedMessage());
             return null;
         }
     }
 
-    //todo
-    public boolean writeV(MemoryTypes type, int starAddress, List<Object> data){
-        byte[] ADU = new byte[10];
-        send(ADU);
-        return true;
+    /**
+     * 读取结果会移除
+     *
+     * @param id
+     * @return
+     */
+    private List<Object> getRes(int id) {
+        Exchange countDownLatchListPair = session.getConcurrentMap().get(id);
+        session.getConcurrentMap().remove(id);
+        return countDownLatchListPair.getResult();
     }
 
-    private int send(byte[] ADU){
-        byte[] cmd = new byte[7 + ADU.length];
-        int id = ThreadLocalRandom.current().nextInt(10000) + 55535;
-        cmd[0] = BitUtil.getInt8To16(id);
-        cmd[1] = BitUtil.getInt0To8(id);
-        cmd[2] = 0;
-        cmd[3] = 0;
-        cmd[4] = BitUtil.getInt8To16(ADU.length +1);
-        cmd[5] = BitUtil.getInt0To8(ADU.length +1);
-        cmd[6] = BitUtil.getInt0To8(slaveId);
-        System.arraycopy(ADU,0,cmd,6,ADU.length);
+
+    //todo
+    @WorkThread
+    public boolean writeV(MemoryTypes type, int starAddress, List<Object> data) {
+        int functionCode = MemoryTypes.type2writeVFunctionCode(type);
+        int bitCount = 0;
+        byte[] value = null;
+        if (functionCode == 15) {
+            bitCount = data.size() / 8 + (data.size() % 8 == 0 ? 0 : 1);
+            value = new byte[bitCount];
+            //todo 线圈设置值
+        } else {
+            bitCount = data.size() * 2;
+            value = new byte[bitCount];
+            for (int i = 0; i < data.size(); i++) {
+                byte[] s = ConvertTo.primitive(data.get(i));
+                value[i * 2] = s[0];
+                value[i * 2 + 1] = s[1];
+            }
+        }
+        byte[] ADU = new byte[6 + bitCount];
+        ADU[0] = BitUtil.getInt0To8(functionCode);
+        ADU[1] = BitUtil.getInt8To16(starAddress);
+        ADU[2] = BitUtil.getInt0To8(starAddress);
+        ADU[3] = BitUtil.getInt8To16(data.size());
+        ADU[4] = BitUtil.getInt0To8(data.size());
+        ADU[5] = BitUtil.getInt0To8(bitCount);
+        //copy
+        System.arraycopy(value, 0, ADU, 6, value.length);
+        CountDownLatch latch = new CountDownLatch(1);
+        int id = session.send(ADU, data.size(),latch);
         try {
-            out.write(cmd);
-            out.flush();
-            list.add(new Pair<>(id,new ArrayList<>()));
-            return id;
-        } catch (IOException e) {
+            latch.await();
+            return (boolean) getRes(id).get(0);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     //主动的 out => in
     @Override
     public void start() {
         //判断 send 出去 的id 有回复相同的id 再解析 再countDown
-        session.run();
+        ModbusExecutors.exec(session);
     }
 }

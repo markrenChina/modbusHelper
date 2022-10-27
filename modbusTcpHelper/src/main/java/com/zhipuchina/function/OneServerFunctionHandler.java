@@ -1,11 +1,10 @@
 package com.zhipuchina.function;
 
-import com.zhipuchina.handler.GlobalLogger;
+import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.model.OutputCoil;
 import com.zhipuchina.utils.Buffer;
 
-public class OneFunctionHandler implements FunctionController {
+public class OneServerFunctionHandler implements FunctionController {
 
     /**
      * 响应PUD
@@ -14,7 +13,7 @@ public class OneFunctionHandler implements FunctionController {
      * @return 一个数组，包含功能码及之后的数据
      */
     @Override
-    public byte[] serve(byte[] header,byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
         int address = (ADU[1] << 8) | (ADU[2] & 0xFF);
         int count = (ADU[3] << 8) | (ADU[4]& 0xFF);
         int outCount = count/8 + 1;

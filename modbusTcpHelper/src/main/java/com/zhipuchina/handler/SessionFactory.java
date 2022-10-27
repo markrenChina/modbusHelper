@@ -1,11 +1,17 @@
 package com.zhipuchina.handler;
 
-import com.zhipuchina.function.FunctionController;
-import com.zhipuchina.utils.FunctionControllerUtil;
-
 import java.net.Socket;
 
-public interface SessionFactory {
+public abstract class SessionFactory {
+    Integer slaveId;
 
-    public ModbusTcpBasicSession accept(Socket socket);
+    /**
+     *
+     * @param slaveId null 忽略slaveId
+     */
+    public SessionFactory(Integer slaveId) {
+        this.slaveId = slaveId;
+    }
+
+    public abstract ModbusTcpBasicSession accept(Socket socket);
 }

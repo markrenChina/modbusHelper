@@ -16,12 +16,16 @@ public class ConvertTo {
         return new byte[] { BitUtil.getInt8To16(in) , BitUtil.getInt0To8(in)};
     }
 
+    public static byte[] primitive(Object in){
+        return primitive(in.toString());
+    }
+
     public static byte[] primitive(String in){
         try {
             try {
-                return primitive(Boolean.parseBoolean(in));
-            }catch (ClassCastException e){
                 return primitive(Short.parseShort(in));
+            }catch (NumberFormatException e){
+                return primitive(Boolean.parseBoolean(in));
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -37,6 +41,10 @@ public class ConvertTo {
 
     public static short getShort(byte v1 ,byte v2){
         return (short) (((v1&0xFF) << 8) | (v2 & 0xFF));
+    }
+
+    public static int getInteger(byte v1 ,byte v2){
+        return (((v1&0xFF) << 8) | (v2 & 0xFF));
     }
 
     public static boolean getBoolean(byte[] val){

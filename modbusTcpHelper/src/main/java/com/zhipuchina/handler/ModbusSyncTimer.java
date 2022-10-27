@@ -1,6 +1,8 @@
 package com.zhipuchina.handler;
 
+import com.zhipuchina.client.SyncOutputStream;
 import com.zhipuchina.function.FunctionController;
+import com.zhipuchina.utils.BitUtil;
 import com.zhipuchina.utils.FunctionControllerUtil;
 
 import java.io.OutputStream;
@@ -12,7 +14,7 @@ public class ModbusSyncTimer implements Runnable {
     private final int functionCode;
     private final int scanRate;
 
-    private OutputStream outputStream;
+    private ModbusTcpBasicSession session;
 
     private int slaveId;
 
@@ -24,7 +26,7 @@ public class ModbusSyncTimer implements Runnable {
     private int count;
 
     public ModbusSyncTimer(int functionCode, int scanRate) {
-        this(functionCode,scanRate,0,10,0);
+        this(functionCode,scanRate,0,10,1);
     }
 
     public ModbusSyncTimer(int functionCode, int scanRate, int startAddress, int count, int slaveId) {
@@ -40,12 +42,12 @@ public class ModbusSyncTimer implements Runnable {
         cmd[4] = 0;
         cmd[5] = 6;
         //单元标识符
-        cmd[6] = (byte) slaveId;
-        cmd[7] = (byte) functionCode;
-        cmd[8] = (byte) ((startAddress >> 8 )&0xFF);
-        cmd[9] = (byte) (startAddress &0xFF);
-        cmd[10] = (byte) ((count >> 8 )&0xFF);
-        cmd[11] = (byte) (count &0xFF);
+        cmd[6] = BitUtil.getInt0To8(slaveId);
+        cmd[7] = BitUtil.getInt0To8(functionCode);
+        cmd[8] = BitUtil.getInt8To16(startAddress);
+        cmd[9] = BitUtil.getInt0To8(startAddress);
+        cmd[10] = BitUtil.getInt8To16(count);
+        cmd[11] = BitUtil.getInt0To8(count);
     }
 
     public void setReadAddress(int startAddress, int count){
@@ -62,23 +64,22 @@ public class ModbusSyncTimer implements Runnable {
         cmd[6] = (byte) slaveId;
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        this.outputStream = outputStream;
+    public void setSession(ModbusTcpBasicSession session) {
+        this.session = session;
     }
 
     @Override
     public void run() {
         try {
-            while (outputStream!= null) {
+            while (session != null) {
                 int id = transActionId.getAndIncrement();
                 if (id == 55535) {
                     id = 0;
                     transActionId.set(1);
                 }
-                cmd[0] = (byte) ((id >> 8 )&0xFF);
-                cmd[1] = (byte) (id & 0xFF);
-                outputStream.write(cmd);
-                outputStream.flush();
+                cmd[0] = BitUtil.getInt8To16(id);
+                cmd[1] = BitUtil.getInt0To8(id);
+                session.writeAndFlush(cmd,this.count,null);
                 TimeUnit.MILLISECONDS.sleep(scanRate);
             }
         } catch (Exception e) {

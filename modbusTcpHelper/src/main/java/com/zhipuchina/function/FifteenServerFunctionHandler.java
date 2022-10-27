@@ -1,8 +1,6 @@
 package com.zhipuchina.function;
 
-import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.model.OutputCoil;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.handler.ModbusTcpBasicSession;
 
 /**
  * 写多个线圈
@@ -17,9 +15,9 @@ import com.zhipuchina.utils.Buffer;
  * 输出地址  2个字节
  * 输出值    2个字节
  */
-public class FifteenFunctionHandler implements FunctionController{
+public class FifteenServerFunctionHandler implements FunctionController{
     @Override
-    public byte[] serve(byte[] header,byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
         int address = (ADU[1] << 8) | (ADU[2] & 0xFF);
         int count = (ADU[3] << 8) | (ADU[4]& 0xFF);
         byte[] out = new byte[12];

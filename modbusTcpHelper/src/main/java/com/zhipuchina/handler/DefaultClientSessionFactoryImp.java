@@ -5,7 +5,7 @@ import com.zhipuchina.utils.FunctionControllerUtil;
 
 import java.net.Socket;
 
-public class DefaultClientSessionFactoryImp implements SessionFactory{
+public class DefaultClientSessionFactoryImp extends SessionFactory{
 
     private static final FunctionController[] functionControllers = new FunctionController[17];
     static {
@@ -14,8 +14,16 @@ public class DefaultClientSessionFactoryImp implements SessionFactory{
         }
     }
 
+    public DefaultClientSessionFactoryImp() {
+        this(null);
+    }
+
+    public DefaultClientSessionFactoryImp(Integer slaveId) {
+        super(slaveId);
+    }
+
     @Override
     public ModbusTcpBasicSession accept(Socket socket) {
-        return new ModbusTcpBasicSession(socket,functionControllers);
+        return new ModbusTcpBasicSession(socket,slaveId,functionControllers);
     }
 }

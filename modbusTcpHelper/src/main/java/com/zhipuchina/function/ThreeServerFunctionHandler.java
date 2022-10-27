@@ -1,5 +1,6 @@
 package com.zhipuchina.function;
 
+import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.utils.Buffer;
 
@@ -17,10 +18,10 @@ import com.zhipuchina.utils.Buffer;
  *  异常响应83
  *  异常码 1个字节
  */
-public class ThreeFunctionHandler implements FunctionController{
+public class ThreeServerFunctionHandler implements FunctionController{
 
     @Override
-    public byte[] serve(byte[] header,byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
         int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
         int count = (ADU[3] << 8) | (ADU[4]& 0xFF);
         int outCount = count << 1;
@@ -33,7 +34,7 @@ public class ThreeFunctionHandler implements FunctionController{
 //            out[9 + i*2] =(byte) ((now >> 8 )& 0xFF);
 //            out[10 + i*2] = (byte) (now & 0xFF);
 //        }
-        byte[] value = Buffer.getValue(MemoryTypes.OutputRegister,address,count);
+        byte[] value = Buffer.getValue(MemoryTypes.HoldingRegister,address,count);
         System.arraycopy(value,0,out,9,value.length);
         return out;
     }

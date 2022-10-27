@@ -4,7 +4,7 @@ public enum MemoryTypes {
     InputCoil(1),
     InputRegister(3),
     OutputCoil(0),
-    OutputRegister(4);
+    HoldingRegister(4);
 
     private int code;
 
@@ -25,7 +25,7 @@ public enum MemoryTypes {
         throw new RuntimeException("null MemoryType");
     }
 
-    public static int type2functionCode(MemoryTypes type) {
+    public static int type2readFunctionCode(MemoryTypes type) {
         int functionCode = 0;
         switch (type){
             case OutputCoil:
@@ -34,7 +34,7 @@ public enum MemoryTypes {
             case InputCoil:
                 functionCode = 2;
                 break;
-            case OutputRegister:
+            case HoldingRegister:
                 functionCode = 4;
                 break;
             case InputRegister:
@@ -42,5 +42,25 @@ public enum MemoryTypes {
                 break;
         }
         return functionCode;
+    }
+
+    public static int type2writeFunctionCode(MemoryTypes type){
+        switch (type){
+            case OutputCoil: return 5;
+            case HoldingRegister:return 6;
+            default: throw new UnsupportedOperationException();
+        }
+    }
+
+    public static int type2writeVFunctionCode(MemoryTypes type){
+        switch (type){
+            case OutputCoil: return  15;
+            case HoldingRegister: return  16;
+            default: throw new UnsupportedOperationException();
+        }
+    }
+
+    public int getPos(int offset){
+        return code * 10000 + offset;
     }
 }

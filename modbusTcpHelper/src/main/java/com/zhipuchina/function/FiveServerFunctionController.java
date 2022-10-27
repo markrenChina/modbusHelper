@@ -1,9 +1,8 @@
 package com.zhipuchina.function;
 
 import com.zhipuchina.handler.GlobalLogger;
+import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.model.OutputCoil;
-import com.zhipuchina.model.OutputRegister;
 import com.zhipuchina.utils.Buffer;
 
 /**
@@ -19,9 +18,9 @@ import com.zhipuchina.utils.Buffer;
  *
  * 异常响应(85 01)
  */
-public class FiveFunctionController implements FunctionController{
+public class FiveServerFunctionController implements FunctionController{
     @Override
-    public byte[] serve(byte[] header,byte[] ADU) {
+    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
         int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
         GlobalLogger.logger.debug("address "+ address);
         boolean value = (ADU[3] >> 7) != 0;
