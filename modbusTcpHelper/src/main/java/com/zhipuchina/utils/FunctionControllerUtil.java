@@ -2,7 +2,7 @@ package com.zhipuchina.utils;
 
 import com.zhipuchina.function.*;
 import com.zhipuchina.function.client.SixteenClientFunctionTemplate;
-import com.zhipuchina.function.client.ThreeClientFunctionHandler;
+import com.zhipuchina.function.client.ThreeClientFunctionTemplate;
 
 public class FunctionControllerUtil {
 
@@ -26,7 +26,7 @@ public class FunctionControllerUtil {
         switch (functionCode){
 //            case 1: functionController = new OneFunctionHandler();break;
 //            case 2: functionController = new TwoFunctionHandler();break;
-            case 3: functionController = new ThreeClientFunctionHandler();break;
+            case 3: functionController = new ThreeClientFunctionTemplate();break;
 //            case 4: functionController = new FourFunctionHandler();break;
 //            case 5: functionController = new FiveFunctionController();break;
 //            case 6: functionController = new SixFunctionController();break;

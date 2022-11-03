@@ -4,6 +4,7 @@ import com.zhipuchina.handler.GlobalLogger;
 import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.utils.ConvertTo;
 
 /**
  * 写单个线圈
@@ -21,15 +22,15 @@ import com.zhipuchina.utils.Buffer;
 public class FiveServerFunctionController implements FunctionController{
     @Override
     public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
-        int address = (ADU[1] << 8) | (ADU[2]& 0xFF);
+        int address = ConvertTo.getInteger(ADU[1],ADU[2] );
         GlobalLogger.logger.debug("address "+ address);
         boolean value = (ADU[3] >> 7) != 0;
         GlobalLogger.logger.debug("write value " + value);
         //2+2+2+1+1+4
         byte[] out = new byte[12];
-//        Buffer.setValue(MemoryTypes.OutputCoil,address,value);
+        Buffer.setValue(MemoryTypes.OutputCoil,address,value);
         System.arraycopy(ADU,0,out,7,ADU.length);
-        boolean now = Boolean.parseBoolean(Buffer.getValue(MemoryTypes.OutputCoil,address).toString());
+        boolean now = Buffer.getValue(MemoryTypes.OutputCoil,address)[0] == 0x01;
         GlobalLogger.logger.debug("写完之后" + address +"的线圈为："+ now);
         return out;
     }

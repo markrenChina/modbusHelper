@@ -73,7 +73,9 @@ public class App
 
 
     public static void main( String[] args ) throws UnknownHostException, InterruptedException {
-       //testServer();
-       testClient();
+       testServer();
+       Buffer.setValue(MemoryTypes.OutputCoil,8,true);
+       System.out.println(Buffer.getValue(MemoryTypes.OutputCoil,8)[0]);
+       //testClient();
     }
 }

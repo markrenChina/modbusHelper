@@ -125,7 +125,7 @@ public class ModbusTcpBasicSession implements Runnable {
                     close();
                     break;
                 }
-                int frameLen = ((header[4] & 0xFF) << 8) | header[5];
+                int frameLen = ((header[4] & 0xFF) << 8) | (header[5] & 0xFF);
                 GlobalLogger.logger.debug("frameLen " + frameLen);
                 ADU = new byte[frameLen - 1];
                 int len = in.readNBytes(ADU, 0, frameLen - 1);

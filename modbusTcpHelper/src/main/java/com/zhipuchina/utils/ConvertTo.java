@@ -39,12 +39,12 @@ public class ConvertTo {
         return getShort(val[0],val[1]);
     }
 
-    public static short getShort(byte v1 ,byte v2){
-        return (short) (((v1&0xFF) << 8) | (v2 & 0xFF));
+    public static short getShort(byte high ,byte low){
+        return (short) (((high&0xFF) << 8) | (low & 0xFF));
     }
 
-    public static int getInteger(byte v1 ,byte v2){
-        return (((v1&0xFF) << 8) | (v2 & 0xFF));
+    public static int getInteger(byte high ,byte low){
+        return (((high&0xFF) << 8) | (low & 0xFF));
     }
 
     public static boolean getBoolean(byte[] val){

@@ -72,6 +72,10 @@ public class Buffer {
         EventManager.doAfterEvent(pos, oldValue, val);
     }
 
+    public static void setValue(int pos, boolean val) {
+        setValue(pos, ConvertTo.primitive(val));
+    }
+
     public static void setValue(int pos, int count, byte[] val) {
         Memory buffer = getBuffer(pos);
         byte[] oldValue = buffer.getValue(pos, count);
@@ -81,6 +85,10 @@ public class Buffer {
     }
 
     public static void setValue(MemoryTypes type, int offset, byte[] val) {
+        setValue(type.getCode() * 10000 + offset, val);
+    }
+
+    public static void setValue(MemoryTypes type, int offset, boolean val) {
         setValue(type.getCode() * 10000 + offset, val);
     }
 

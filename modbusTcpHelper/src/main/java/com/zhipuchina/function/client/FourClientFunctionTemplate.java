@@ -4,7 +4,7 @@ import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.pojo.Exchange;
 import com.zhipuchina.utils.Buffer;
 
-public class ThreeClientFunctionHandler extends ClientFunctionTemplate {
+public class FourClientFunctionTemplate extends ClientFunctionTemplate {
 
     @Override
     public void recv(byte[] header, byte[] ADU, Exchange exchange) {

@@ -8,4 +8,53 @@ public class BitUtil {
     public static byte getInt8To16(int value) {
         return (byte) (value >> 8);
     }
+
+    public static int[] zeroHelper = new int[]{
+            0x7F, 0xBF, 0xDF, 0xEF,
+            0xF7, 0xFB, 0xFD, 0xFE
+    };
+
+    /**
+     * count 范围1~8，byte从左往右算起
+     */
+    public static byte setBit(byte src, int count, int val) {
+        if (val == 1) {
+            return (byte) (1 << (8 - count) | src);
+        } else {
+            //需要and 只有位置0其他都是1
+            return (byte) (zeroHelper[count-1] & src);
+        }
+    }
+
+    public static byte reversal(byte val){
+        int tmp = val & 0xFF;
+        int res = 0;
+        for (int i = 1; i < 8; i++) {
+            int lastValue =  tmp & 0x01;
+            res |= lastValue;
+            tmp = tmp >> 1;
+            res = res << 1;
+        }
+        int lastValue =  tmp & 0x01;
+        res |= lastValue;
+        return (byte) res;
+    }
+
+    public static void main(String[] args) {
+        //0xFE 最后一位置1，应该是0xFF
+        byte v1 = setBit((byte) 0xFE,8,1);
+        System.out.println(v1 == (byte) 0xFF);
+        //0xFF 最后一位置0，应该是0xFE
+        byte v2 = setBit((byte) 0xFF,8,0);
+        System.out.println(v2 == (byte) 0xFE);
+        //0x7F 第一位置1，应该是0xFF
+        byte v3 = setBit((byte) 0x7F,1,1);
+        System.out.println(v3 == (byte) 0xFF);
+        //0xFF 第一位置0，应该是0x7F
+        byte v4 = setBit((byte) 0xFF,1,0);
+        System.out.println(v4 == (byte) 0x7F);
+
+        byte v5 = setBit((byte) 0xE9,4,1);
+        System.out.println(v5 == (byte) 0xF9);
+    }
 }
