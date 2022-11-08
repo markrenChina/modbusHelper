@@ -1,5 +1,6 @@
 package com.zhipuchina;
 
+import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.model.Coil;
 import com.zhipuchina.model.Register;
 import com.zhipuchina.model.Slice;
@@ -42,7 +43,7 @@ public class SliceTest extends TestCase {
         assertNull(nullNext);
     }
 
-    public void testMallocCoil(){
+    public void testMallocCoil() throws ModbusException {
         Coil coil = new Coil(null);
         coil.malloc(0,10);
         Slice head = coil.findSlice(0);

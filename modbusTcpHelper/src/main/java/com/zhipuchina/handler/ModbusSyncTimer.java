@@ -1,11 +1,7 @@
 package com.zhipuchina.handler;
 
-import com.zhipuchina.client.SyncOutputStream;
-import com.zhipuchina.function.FunctionController;
 import com.zhipuchina.utils.BitUtil;
-import com.zhipuchina.utils.FunctionControllerUtil;
 
-import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +39,7 @@ public class ModbusSyncTimer implements Runnable {
         cmd[5] = 6;
         //单元标识符
         cmd[6] = BitUtil.getInt0To8(slaveId);
+        //功能码
         cmd[7] = BitUtil.getInt0To8(functionCode);
         cmd[8] = BitUtil.getInt8To16(startAddress);
         cmd[9] = BitUtil.getInt0To8(startAddress);
@@ -79,7 +76,7 @@ public class ModbusSyncTimer implements Runnable {
                 }
                 cmd[0] = BitUtil.getInt8To16(id);
                 cmd[1] = BitUtil.getInt0To8(id);
-                session.writeAndFlush(cmd,this.count,null);
+                session.writeAndFlush(cmd,this.count,null,null);
                 TimeUnit.MILLISECONDS.sleep(scanRate);
             }
         } catch (Exception e) {

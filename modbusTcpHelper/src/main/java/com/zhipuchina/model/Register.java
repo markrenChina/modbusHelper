@@ -1,8 +1,8 @@
 package com.zhipuchina.model;
 
+import com.zhipuchina.exception.ModbusException;
+import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.utils.Buffer;
-
-import java.util.Iterator;
 
 public class Register extends Memory {
 
@@ -26,7 +26,7 @@ public class Register extends Memory {
     }
 
     @Override
-    public byte[] getValue(int start, int count) {
+    public byte[] getValue(int start, int count) throws ModbusException {
         Slice slice = findSlice(start, count);
         if (slice != null) {
             int index = start - slice.start;
@@ -34,7 +34,7 @@ public class Register extends Memory {
             System.arraycopy(slice.data, index * 2, res, 0, count * 2);
             return res;
         } else {
-            return null;
+            throw ModbusExceptionFactory.create(2);
         }
     }
 

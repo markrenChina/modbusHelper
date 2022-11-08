@@ -1,13 +1,13 @@
 package com.zhipuchina.utils;
 
-import com.zhipuchina.event.AfterEventHandler;
-import com.zhipuchina.event.BeforeEventHandler;
 import com.zhipuchina.event.EventManager;
+import com.zhipuchina.exception.ModbusException;
+import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.exec.ModbusExecutors;
-import com.zhipuchina.model.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.zhipuchina.model.Coil;
+import com.zhipuchina.model.Memory;
+import com.zhipuchina.model.MemoryTypes;
+import com.zhipuchina.model.Register;
 
 public class Buffer {
 
@@ -49,54 +49,69 @@ public class Buffer {
         return buffer.getValue(pos);
     }
 
-    public static byte[] getValue(int pos, int count) {
+    public static byte[] getValue(int pos, int count) throws ModbusException {
         Memory buffer = getBuffer(pos);
-        return buffer.getValue(pos,count);
+        return buffer.getValue(pos, count);
     }
 
     public static byte[] getValue(MemoryTypes type, int offset) {
         return getValue(type.getCode() * 10000 + offset);
     }
 
-    public static byte[] getValue(MemoryTypes type, int offset, int count) {
-        return getValue(type.getCode() * 10000 + offset,count);
+    public static byte[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
+        return getValue(type.getCode() * 10000 + offset, count);
     }
 
-
-
-    public static void setValue(int pos, byte[] val) {
+    public static void setValue(int pos, byte[] val) throws ModbusException {
         Memory buffer = getBuffer(pos);
         byte[] oldValue = buffer.getValue(pos);
+        if (EventManager.isNeedAsync(pos, 1)) {
+            ModbusExecutors.exec(() -> {
+                EventManager.doBeforeEvent(pos, oldValue, val);
+                buffer.setValue(pos, val);
+                EventManager.doAfterEvent(pos, oldValue, val);
+            });
+            throw ModbusExceptionFactory.create(5);
+        }
+
         EventManager.doBeforeEvent(pos, oldValue, val);
         buffer.setValue(pos, val);
         EventManager.doAfterEvent(pos, oldValue, val);
     }
 
-    public static void setValue(int pos, boolean val) {
+    public static void setValue(int pos, boolean val) throws ModbusException {
         setValue(pos, ConvertTo.primitive(val));
     }
 
-    public static void setValue(int pos, int count, byte[] val) {
+    public static void setValue(int pos, int count, byte[] val) throws ModbusException {
         Memory buffer = getBuffer(pos);
         byte[] oldValue = buffer.getValue(pos, count);
-        EventManager.doBeforeEvent(pos,count,oldValue, val);
+        if (EventManager.isNeedAsync(pos, count)){
+            ModbusExecutors.exec(() -> {
+                EventManager.doBeforeEvent(pos, count, oldValue, val);
+                buffer.setValue(pos, count, val);
+                EventManager.doAfterEvent(pos, count, oldValue, val);
+            });
+            throw ModbusExceptionFactory.create(5);
+        }
+        EventManager.doBeforeEvent(pos, count, oldValue, val);
         buffer.setValue(pos, count, val);
-        EventManager.doAfterEvent(pos,count,oldValue, val);
+        EventManager.doAfterEvent(pos, count, oldValue, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, byte[] val) {
+    public static void setValue(MemoryTypes type, int offset, byte[] val)throws ModbusException {
         setValue(type.getCode() * 10000 + offset, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, boolean val) {
+    public static void setValue(MemoryTypes type, int offset, boolean val)throws ModbusException {
         setValue(type.getCode() * 10000 + offset, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, int count, byte[] val) {
+    public static void setValue(MemoryTypes type, int offset, int count, byte[] val) throws ModbusException {
         setValue(type.getCode() * 10000 + offset, count, val);
     }
 
-    public static int count(int endPos, int startPos){
+    public static int count(int endPos, int startPos) {
         assert endPos >= startPos;
         return endPos - startPos + 1;
     }

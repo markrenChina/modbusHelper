@@ -1,9 +1,6 @@
 package com.zhipuchina.function;
 
-import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.utils.Buffer;
-import com.zhipuchina.utils.ConvertTo;
 
 /**
  * 读保持寄存器
@@ -19,20 +16,18 @@ import com.zhipuchina.utils.ConvertTo;
  *  异常响应83
  *  异常码 1个字节
  */
-public class ThreeServerFunctionHandler extends ServerFunctionTemplate{
+public class ThreeServerFunctionReadHandler extends ServerFunctionReadTemplate {
+    public ThreeServerFunctionReadHandler() {
+        super(MemoryTypes.HoldingRegister);
+    }
+
     @Override
     public int getOutCount(int count) {
         return count << 1;
     }
 
     @Override
-    public void recv(int count, byte[] out, int address) {
-//        for (int i = 0; i < count; i++) {
-//            int now = Integer.parseInt(Buffer.getValue(MemoryTypes.OutputRegister,address + i).toString());
-//            out[9 + i*2] =(byte) ((now >> 8 )& 0xFF);
-//            out[10 + i*2] = (byte) (now & 0xFF);
-//        }
-        byte[] value = Buffer.getValue(MemoryTypes.HoldingRegister,address,count);
+    public void process(byte[] value,byte[] out) {
         System.arraycopy(value,0,out,9,value.length);
     }
 

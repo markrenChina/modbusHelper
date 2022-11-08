@@ -35,10 +35,10 @@ public enum MemoryTypes {
                 functionCode = 2;
                 break;
             case HoldingRegister:
-                functionCode = 4;
+                functionCode = 3;
                 break;
             case InputRegister:
-                functionCode = 3;
+                functionCode = 4;
                 break;
         }
         return functionCode;

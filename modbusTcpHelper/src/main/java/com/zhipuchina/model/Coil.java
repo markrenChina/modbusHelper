@@ -1,5 +1,7 @@
 package com.zhipuchina.model;
 
+import com.zhipuchina.exception.ModbusException;
+import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.utils.BitUtil;
 import com.zhipuchina.utils.Buffer;
 
@@ -39,10 +41,10 @@ public class Coil extends Memory {
 
     //todo 优化为System.arrayCopy
     @Override
-    public byte[] getValue(int start, int count) {
+    public byte[] getValue(int start, int count) throws ModbusException {
         Slice slice = findSlice(start);
         if (slice == null || (slice.end + 1) < (start + count)){
-            return null;
+            throw ModbusExceptionFactory.create(2);
         }
         byte[] res = new byte[count/8+1];
         for (int i = 0; i < count; i++) {
@@ -52,6 +54,7 @@ public class Coil extends Memory {
         return res;
     }
 
+    //单个值设置的方法
     @Override
     public void setValue(int pos,byte[] val) {
         Slice slice = findSlice(pos);
@@ -79,6 +82,14 @@ public class Coil extends Memory {
         }
     }
 
+    /**
+     * val 二进制从左到右排列，与TCP层传输byte从右到左不同
+     * 可以使用 工具翻转单个byte
+     * @see BitUtil#reversal(byte)
+     * @param start 起始地址
+     * @param count 数量
+     * @param val 值
+     */
     @Override
     public void setValue(int start, int count, byte[] val) {
         Slice slice = findSlice(start);

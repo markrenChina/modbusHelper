@@ -1,27 +1,24 @@
 package com.zhipuchina.function;
 
-import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.utils.BitUtil;
-import com.zhipuchina.utils.Buffer;
-import com.zhipuchina.utils.ConvertTo;
 
-import java.util.Arrays;
+public class OneServerFunctionReadHandler extends ServerFunctionReadTemplate {
 
-public class OneServerFunctionHandler extends ServerFunctionTemplate {
+    public OneServerFunctionReadHandler() {
+        super(MemoryTypes.OutputCoil);
+    }
+
     @Override
     public int getOutCount(int count) {
         return count/8 + 1;
     }
 
     @Override
-    public void recv(int count, byte[] out, int address) {
-        byte[] value = Buffer.getValue(MemoryTypes.OutputCoil, address, count);
-        System.out.println(Arrays.toString(value));
+    public void process(byte[] value, byte[] out) {
         for (int i = 0; i < value.length; i++) {
             value[i] = BitUtil.reversal(value[i]);
         }
-        System.out.println(Arrays.toString(value));
         System.arraycopy(value,0,out,9,value.length);
     }
 

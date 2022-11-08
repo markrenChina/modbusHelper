@@ -1,7 +1,6 @@
 package com.zhipuchina.event;
 
 import com.zhipuchina.exec.ModbusExecutors;
-import com.zhipuchina.model.Memory;
 import com.zhipuchina.model.MemoryTypes;
 
 import java.util.ArrayList;
@@ -50,14 +49,23 @@ public class EventManager {
         return aEvents.get(key);
     }
 
-    public static void doBeforeEvent(int pos, byte[] oldValue, byte[] newValue) {
+    public static boolean isNeedAsync(int pos, int count){
+        boolean res = false;
+        for (int i = 0; i < count; i++) {
+            BeforeEventHandler beforeEvent = getBeforeEvent(pos + i);
+            res |= (beforeEvent != null && beforeEvent.isNeedAsync());
+        }
+        return res;
+    }
+
+    public static void doBeforeEvent(int pos, byte[] oldValue, byte[] newValue)  {
         BeforeEventHandler beforeEvent = getBeforeEvent(pos);
         if (beforeEvent != null){
             beforeEvent.process(oldValue,newValue);
         }
     }
 
-    public static void doBeforeEvent(int pos, int count, byte[] oldValue, byte[] newValue) {
+    public static void doBeforeEvent(int pos, int count, byte[] oldValue, byte[] newValue){
         for (int i = 0; i < count; i++) {
             doBeforeEvent(pos + i ,oldValue , newValue);
         }
@@ -75,10 +83,19 @@ public class EventManager {
     }
 
     public static void doAfterEvent(int pos, int count, byte[] oldValue, byte[] newValue) {
-        for (int i = 0; i < count; i++) {
-            doAfterEvent(pos + i,
-                    new byte[]{oldValue[i * 2], oldValue[i * 2 + 1]},
-                    new byte[]{newValue[i * 2], newValue[i * 2 + 1]});
+        if (pos >= 30000) {
+            for (int i = 0; i < count; i++) {
+                doAfterEvent(pos + i,
+                        new byte[]{oldValue[i * 2], oldValue[i * 2 + 1]},
+                        new byte[]{newValue[i * 2], newValue[i * 2 + 1]});
+            }
+        } else if (pos < 20000) {
+            //todo
+//            for (int i = 0; i < count; i++) {
+//                doAfterEvent(pos + i,
+//                        new byte[]{oldValue[i * 2], oldValue[i * 2 + 1]},
+//                        new byte[]{newValue[i * 2], newValue[i * 2 + 1]});
+//            }
         }
     }
 }
