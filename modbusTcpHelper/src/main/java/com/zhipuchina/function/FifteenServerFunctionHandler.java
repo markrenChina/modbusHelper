@@ -29,6 +29,11 @@ public class FifteenServerFunctionHandler extends ServerFunctionWriteTemplate {
         return value;
     }
 
+    @Override
+    public int getCount(byte[] ADU) {
+        return ConvertTo.getInteger(ADU[3], ADU[4]);
+    }
+
 //    @Override
 //    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
 //        int address = ConvertTo.getInteger(ADU[1],ADU[2] );

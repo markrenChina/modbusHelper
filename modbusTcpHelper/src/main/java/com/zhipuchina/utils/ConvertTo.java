@@ -36,7 +36,11 @@ public class ConvertTo {
     }
 
     public static short getShort(byte[] val){
-        return getShort(val[0],val[1]);
+        if (val.length == 2){
+            return getShort(val[0],val[1]);
+        }else {
+            return (short)(val[0] & 0xFF);
+        }
     }
 
     public static short getShort(byte high ,byte low){

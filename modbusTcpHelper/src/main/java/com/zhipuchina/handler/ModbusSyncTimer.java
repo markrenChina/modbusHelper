@@ -83,4 +83,8 @@ public class ModbusSyncTimer implements Runnable {
             throw new RuntimeException(e);
         }
     }
+
+    public void close(){
+        session = null;
+    }
 }

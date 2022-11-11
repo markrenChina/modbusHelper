@@ -3,6 +3,7 @@ package com.zhipuchina.model;
 import com.zhipuchina.exception.ModbusException;
 
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class Memory{
     protected Slice head;
@@ -13,6 +14,7 @@ public abstract class Memory{
 
     public abstract byte[] getValue(int pos);
     public abstract byte[] getValue(int start,int count) throws ModbusException;
+    public abstract List<Integer> getValueAsInt(int start, int count) throws ModbusException;
 
     public abstract void setValue(int pos,byte[] val);
     public abstract void setValue(int start,int count,byte[] val);

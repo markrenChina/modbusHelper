@@ -7,7 +7,7 @@ import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.handler.ModbusSyncTimer;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.server.ModbusTcpServer;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.model.Buffer;
 import com.zhipuchina.utils.ConvertTo;
 
 import java.lang.management.ManagementFactory;
@@ -87,8 +87,8 @@ public class App {
 //
 //        byte[] value = Buffer.getValue(MemoryTypes.OutputCoil, 0,10);
 //        System.out.println(Arrays.toString(value));
-        client.write(MemoryTypes.OutputCoil, 8, false);
-        client.writeV(MemoryTypes.OutputCoil,0, List.of(true,true,false,true,true));
+        //client.write(MemoryTypes.OutputCoil, 8, true);
+        client.writeV(MemoryTypes.OutputCoil,0, List.of(true,true,false,true,true,false,false,true,true));
 
         //        for (int i = 0; i < 100; i++) {
 //            TimeUnit.SECONDS.sleep(1);
@@ -119,7 +119,7 @@ public class App {
 
 
     public static void main(String[] args) throws UnknownHostException, ModbusException, InterruptedException {
-//        testServer();
-        testClient();
+        testServer();
+       //testClient();
     }
 }

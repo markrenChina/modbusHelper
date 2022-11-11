@@ -3,7 +3,10 @@ package com.zhipuchina.model;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.utils.BitUtil;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.utils.ConvertTo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Coil extends Memory {
 
@@ -50,6 +53,20 @@ public class Coil extends Memory {
         for (int i = 0; i < count; i++) {
             boolean value = getValue(slice,start + i);
             setValue(res,i,value);
+        }
+        return res;
+    }
+
+    @Override
+    public List<Integer> getValueAsInt(int start, int count) throws ModbusException {
+        Slice slice = findSlice(start);
+        if (slice == null || (slice.end + 1) < (start + count)){
+            throw ModbusExceptionFactory.create(2);
+        }
+        List<Integer> res = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            boolean value = getValue(slice,start + i);
+            res.add(i, value ? 1 : 0);
         }
         return res;
     }

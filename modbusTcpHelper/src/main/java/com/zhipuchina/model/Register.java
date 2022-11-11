@@ -2,7 +2,10 @@ package com.zhipuchina.model;
 
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.utils.ConvertTo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Register extends Memory {
 
@@ -36,6 +39,16 @@ public class Register extends Memory {
         } else {
             throw ModbusExceptionFactory.create(2);
         }
+    }
+
+    @Override
+    public List<Integer> getValueAsInt(int start, int count) throws ModbusException {
+        byte[] value = getValue(start,count);
+        List<Integer> res = new ArrayList<>(value.length/2);
+        for (int i = 0; i < value.length/2; i++) {
+            res.add(i, ConvertTo.getInteger(value[i * 2], value[i * 2 + 1]));
+        }
+        return res;
     }
 
     @Override

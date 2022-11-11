@@ -1,13 +1,6 @@
 package com.zhipuchina;
 
-import com.zhipuchina.handler.GlobalLogger;
-import com.zhipuchina.model.*;
-import com.zhipuchina.server.ModbusTcpServer;
-import com.zhipuchina.utils.Buffer;
 import junit.framework.TestCase;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Unit test for simple App.

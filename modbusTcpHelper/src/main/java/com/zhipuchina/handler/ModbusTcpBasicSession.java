@@ -204,7 +204,7 @@ public class ModbusTcpBasicSession implements Runnable {
         }
     }
 
-    private void close() {
+    public void close() {
         if (in != null) {
             try {
                 in.close();

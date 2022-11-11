@@ -25,6 +25,11 @@ public class SixteenServerFunctionHandler extends ServerFunctionWriteTemplate{
         return value;
     }
 
+    @Override
+    public int getCount(byte[] ADU) {
+        return ConvertTo.getShort(ADU[3],ADU[4]);
+    }
+
 //    @Override
 //    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
 //        //地址

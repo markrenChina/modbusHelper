@@ -1,4 +1,4 @@
-package com.zhipuchina.utils;
+package com.zhipuchina.model;
 
 import com.zhipuchina.event.EventManager;
 import com.zhipuchina.exception.ModbusException;
@@ -8,6 +8,9 @@ import com.zhipuchina.model.Coil;
 import com.zhipuchina.model.Memory;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.model.Register;
+import com.zhipuchina.utils.ConvertTo;
+
+import java.util.List;
 
 public class Buffer {
 
@@ -54,12 +57,21 @@ public class Buffer {
         return buffer.getValue(pos, count);
     }
 
+    public static List<Integer>  getValueAsInt(int pos, int count) throws ModbusException {
+        Memory buffer = getBuffer(pos);
+        return buffer.getValueAsInt(pos, count);
+    }
+
     public static byte[] getValue(MemoryTypes type, int offset) {
         return getValue(type.getCode() * 10000 + offset);
     }
 
     public static byte[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
         return getValue(type.getCode() * 10000 + offset, count);
+    }
+
+    public static List<Integer> getValueAsInt(MemoryTypes type, int offset, int count) throws ModbusException {
+        return getValueAsInt(type.getCode() * 10000 + offset, count);
     }
 
     public static void setValue(int pos, byte[] val) throws ModbusException {

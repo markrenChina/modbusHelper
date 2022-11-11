@@ -22,6 +22,7 @@ public class ModbusTcpClient extends TcpClient {
     //private final ModbusTcpBasicSession basicSession;
 
     private final ModbusTcpBasicSession session;
+    private ModbusSyncTimer task;
 
     public ModbusTcpClient(
             SocketAddress remoteAddress,
@@ -32,6 +33,7 @@ public class ModbusTcpClient extends TcpClient {
         super(remoteAddress, localAddress);
         this.session = factory.accept(socket);
         if (task != null) {
+            this.task = task;
             task.setSession(session);
             ModbusExecutors.exec(task);
         }
@@ -145,9 +147,14 @@ public class ModbusTcpClient extends TcpClient {
                     end = data.size()%8;
                 }
                 for (int j = 0; j < end; j++) {
-                    value[i] = BitUtil.setBit(value[i],0,(ConvertTo.primitive(data.get(i*8+j))[0] & 0xFF));
-                    value[i] = (byte) (value[i] << 1);
+                    value[i] = BitUtil.setBit(value[i],8-j,(ConvertTo.primitive(data.get(i*8+j))[0] & 0xFF));
+                    //value[i] = (byte) (value[i] << 1);
                 }
+//                if (end == 0){
+//                    continue;
+//                }
+//                value[i] = BitUtil.setBit(value[i],8,(ConvertTo.primitive(data.get(i*8+ end -1))[0] & 0xFF));
+
             }
         } else {
             bitCount = data.size() * 2;
@@ -183,5 +190,12 @@ public class ModbusTcpClient extends TcpClient {
     public void start() {
         //判断 send 出去 的id 有回复相同的id 再解析 再countDown
         ModbusExecutors.exec(session);
+    }
+
+    public void close(){
+        if (task != null){
+            task.close();
+        }
+        session.close();
     }
 }

@@ -3,7 +3,7 @@ package com.zhipuchina.function.client;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.pojo.Exchange;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.model.Buffer;
 import com.zhipuchina.utils.ConvertTo;
 
 public class ThreeClientFunctionHandler extends ClientFunctionTemplate {

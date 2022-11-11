@@ -3,7 +3,7 @@ package com.zhipuchina.function;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.utils.Buffer;
+import com.zhipuchina.model.Buffer;
 import com.zhipuchina.utils.ConvertTo;
 
 public abstract class ServerFunctionReadTemplate implements FunctionController {

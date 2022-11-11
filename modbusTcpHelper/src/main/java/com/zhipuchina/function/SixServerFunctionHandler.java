@@ -26,6 +26,11 @@ public class SixServerFunctionHandler extends ServerFunctionWriteTemplate{
         return new byte[]{ ADU[3] ,ADU[4] };
     }
 
+    @Override
+    public int getCount(byte[] ADU) {
+        return 1;
+    }
+
 
 //    @Override
 //    public byte[] serve(byte[] header,byte[] ADU, ModbusTcpBasicSession session) {
