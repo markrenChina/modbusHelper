@@ -2,10 +2,8 @@ package com.zhipuchina.model;
 
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
+import com.zhipuchina.utils.BitUtil;
 import com.zhipuchina.utils.ConvertTo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Register extends Memory {
 
@@ -14,69 +12,41 @@ public class Register extends Memory {
     }
 
     @Override
-    public byte[] getValue(int pos) {
+    public Integer getValue(int pos) {
         Slice slice = findSlice(pos);
         if (slice != null) {
-            byte[] data = slice.data;
+            Byte[] data = (Byte[]) slice.data;
             int index = pos - slice.start;
-            byte[] res = new byte[2];
-            res[0] = data[index * 2];
-            res[1] = data[index * 2 + 1];
-            return res;
+            return ConvertTo.getInteger(data[index * 2],data[index * 2 + 1]);
         } else {
             return null;
         }
     }
 
     @Override
-    public byte[] getValue(int start, int count) throws ModbusException {
+    public Integer[] getValue(int start, int count) throws ModbusException {
         Slice slice = findSlice(start, count);
         if (slice != null) {
             int index = start - slice.start;
-            byte[] res = new byte[2 * count];
-            System.arraycopy(slice.data, index * 2, res, 0, count * 2);
+            Integer[] res = new Integer[count];
+            for (int i = 0; i < count; i++) {
+                res[i] =  ConvertTo.getInteger((byte)slice.data[i * 2],(byte)slice.data[i * 2 + 1]);
+            }
+//            System.arraycopy(slice.data, index * 2, res, 0, count * 2);
             return res;
         } else {
             throw ModbusExceptionFactory.create(2);
         }
     }
 
-    @Override
-    public List<Integer> getValueAsInt(int start, int count) throws ModbusException {
-        byte[] value = getValue(start,count);
-        List<Integer> res = new ArrayList<>(value.length/2);
-        for (int i = 0; i < value.length/2; i++) {
-            res.add(i, ConvertTo.getInteger(value[i * 2], value[i * 2 + 1]));
-        }
-        return res;
-    }
+
+
 
     @Override
-    public void setValue(int pos, byte[] val) {
-        Slice slice = findSlice(pos);
-        if (slice != null) {
-            int count = pos - slice.start;
-            if (val.length == 2) {
-                slice.data[count * 2] = val[0];
-                slice.data[count * 2 + 1] = val[1];
-                return;
-            }
-        }
-        throw new RuntimeException("illegal address");
-    }
-
-    @Override
-    public void setValue(int start, int count, byte[] val) {
-        if (val.length == count * 2) {
-            Slice slice = findSlice(start, count);
-            if (slice != null) {
-                int index = start - slice.start;
-                System.arraycopy(val, 0, slice.data, index * 2, val.length);
-                return;
-            }
-            throw new RuntimeException("illegal address");
-        }
-        throw new RuntimeException("illegal data");
+    protected void setValue(Slice slice, int pos, Integer val) {
+        int count = pos - slice.start;
+        slice.data[count * 2] = BitUtil.getInt8To16(val);
+        slice.data[count * 2 + 1] = BitUtil.getInt0To8(val);
     }
 
     @Override

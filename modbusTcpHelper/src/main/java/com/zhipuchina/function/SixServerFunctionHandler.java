@@ -1,6 +1,7 @@
 package com.zhipuchina.function;
 
 import com.zhipuchina.model.MemoryTypes;
+import com.zhipuchina.utils.ConvertTo;
 
 /**
  * 写单个输出寄存器
@@ -22,8 +23,9 @@ public class SixServerFunctionHandler extends ServerFunctionWriteTemplate{
     }
 
     @Override
-    public byte[] getValue(byte[] ADU) {
-        return new byte[]{ ADU[3] ,ADU[4] };
+    public Integer[] getValue(byte[] ADU) {
+
+        return new Integer[]{ConvertTo.getInteger(ADU[3],ADU[4])};
     }
 
     @Override

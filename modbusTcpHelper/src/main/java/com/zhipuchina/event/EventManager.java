@@ -58,20 +58,20 @@ public class EventManager {
         return res;
     }
 
-    public static void doBeforeEvent(int pos, byte[] oldValue, byte[] newValue)  {
+    public static void doBeforeEvent(int pos, Integer oldValue, Integer newValue)  {
         BeforeEventHandler beforeEvent = getBeforeEvent(pos);
         if (beforeEvent != null){
             beforeEvent.process(oldValue,newValue);
         }
     }
 
-    public static void doBeforeEvent(int pos, int count, byte[] oldValue, byte[] newValue){
+    public static void doBeforeEvent(int pos, int count, Integer[] oldValue, Integer[] newValue){
         for (int i = 0; i < count; i++) {
-            doBeforeEvent(pos + i ,oldValue , newValue);
+            doBeforeEvent(pos + i ,oldValue[i] , newValue[i]);
         }
     }
 
-    public static void doAfterEvent(int pos, byte[] oldValue, byte[] newValue) {
+    public static void doAfterEvent(int pos, Integer oldValue, Integer newValue) {
         List<AfterEventHandler> afterEvents = getAfterEvent(pos);
         if (afterEvents != null){
             ModbusExecutors.exec(() -> {
@@ -82,20 +82,9 @@ public class EventManager {
         }
     }
 
-    public static void doAfterEvent(int pos, int count, byte[] oldValue, byte[] newValue) {
-        if (pos >= 30000) {
-            for (int i = 0; i < count; i++) {
-                doAfterEvent(pos + i,
-                        new byte[]{oldValue[i * 2], oldValue[i * 2 + 1]},
-                        new byte[]{newValue[i * 2], newValue[i * 2 + 1]});
-            }
-        } else if (pos < 20000) {
-            //todo
-//            for (int i = 0; i < count; i++) {
-//                doAfterEvent(pos + i,
-//                        new byte[]{oldValue[i * 2], oldValue[i * 2 + 1]},
-//                        new byte[]{newValue[i * 2], newValue[i * 2 + 1]});
-//            }
+    public static void doAfterEvent(int pos, int count, Integer[] oldValue, Integer[] newValue) {
+        for (int i = 0; i < count; i++) {
+            doAfterEvent(pos + i, oldValue[i], newValue[i]);
         }
     }
 }

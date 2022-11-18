@@ -6,9 +6,9 @@ public class ConvertTo {
 
     public static byte[] primitive(boolean in) {
         if (in) {
-            return new byte[]{0x01};
+            return new byte[]{0x00,0x01};
         } else {
-            return new byte[]{0x00};
+            return new byte[]{0x00,0x00};
         }
     }
 

@@ -20,7 +20,7 @@ public abstract class ClientFunctionTemplate implements FunctionController {
         }
         int funCode = (ADU[0] & 0xFF);
         if (funCode >= 85){
-            exchange.getResult().add(false);
+            exchange.getResult().add(0);
         }
 
         recv(header, ADU, exchange);

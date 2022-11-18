@@ -80,13 +80,13 @@ public class ModbusTcpClient extends TcpClient {
         //去判断有回复再返回true 没回复 返回false
         try {
             latch.await();
-            return (boolean) getRes(id).get(0);
+            return getRes(id).get(0) == 1;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Object> readVSync(MemoryTypes type, int startAddress, int count) {
+    public List<Integer> readVSync(MemoryTypes type, int startAddress, int count) {
         CountDownLatch latch = new CountDownLatch(1);
         byte[] ADU = new byte[5];
         ADU[0] = (byte) MemoryTypes.type2readFunctionCode(type);
@@ -123,7 +123,7 @@ public class ModbusTcpClient extends TcpClient {
      * @param id
      * @return
      */
-    private List<Object> getRes(int id) {
+    private List<Integer> getRes(int id) {
         Exchange countDownLatchListPair = session.getConcurrentMap().get(id);
         session.getConcurrentMap().remove(id);
         return countDownLatchListPair.getResult();
@@ -178,7 +178,7 @@ public class ModbusTcpClient extends TcpClient {
         int id = session.send(ADU, data.size(),latch);
         try {
             latch.await();
-            return (boolean) getRes(id).get(0);
+            return  getRes(id).get(0) == 1;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

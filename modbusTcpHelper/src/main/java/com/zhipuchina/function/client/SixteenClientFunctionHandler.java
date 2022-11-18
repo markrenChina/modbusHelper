@@ -16,7 +16,6 @@ public class SixteenClientFunctionHandler extends ClientFunctionTemplate {
     @Override
     public void recv(byte[] header, byte[] ADU, Exchange exchange) throws ModbusException {
         int count = exchange.getCount();
-
-        exchange.getResult().add(true);
+        exchange.getResult().add(1);
     }
 }

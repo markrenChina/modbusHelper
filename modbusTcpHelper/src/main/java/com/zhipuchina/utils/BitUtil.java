@@ -26,6 +26,16 @@ public class BitUtil {
         }
     }
 
+    /**
+     * count 范围1~8，byte从左往右算起
+     * @return 1 true 0 false
+     */
+    public static boolean getBit(byte src, int count) {
+        int tmp = src & 0xFF;
+        tmp = tmp >> (8-count);
+        return (tmp & 0x01) == 0x01;
+    }
+
     public static byte reversal(byte val){
         int tmp = val & 0xFF;
         int res = 0;

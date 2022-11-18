@@ -1,6 +1,7 @@
 package com.zhipuchina.function;
 
 import com.zhipuchina.model.MemoryTypes;
+import com.zhipuchina.utils.BitUtil;
 import com.zhipuchina.utils.ConvertTo;
 
 /**
@@ -22,10 +23,12 @@ public class FifteenServerFunctionHandler extends ServerFunctionWriteTemplate {
     }
 
     @Override
-    public byte[] getValue(byte[] ADU) {
+    public Integer[] getValue(byte[] ADU) {
         int count = ConvertTo.getInteger(ADU[3], ADU[4]);
-        byte[] value = new byte[count / 8 + 1];
-        System.arraycopy(ADU, 6, value, 0, value.length);
+        Integer[] value = new Integer[count];
+        for (int i = 0; i < count; i++) {
+            value[i] = BitUtil.getBit(ADU[6 + i /8],8 - i%8 ) ? 1 :0;
+        }
         return value;
     }
 

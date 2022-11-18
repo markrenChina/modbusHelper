@@ -6,13 +6,18 @@ import java.util.Objects;
 public class Slice {
     int start;  //包含 绝对地址
     int end;    //包含 绝对地址
-    byte[] data;
     Slice next;
+    BaseArray data;
 
-    public Slice(int start, int end, byte[] data, Slice next) {
+    private static class PreSlice extends Slice{
+        public PreSlice(Slice next) {
+            super(-1, -1, null, next);
+        }
+    }
+
+    public Slice(int start, int end,BaseArray data,Slice next) {
         this.start = start;
         this.end = end;
-        this.data = data;
         this.next = next;
     }
 
@@ -31,7 +36,7 @@ public class Slice {
 
     public Iterator<Slice> iterator(){
         return new Iterator<>() {
-            private Slice current = new Slice(-1,-1,null,Slice.this);
+            private Slice current = new PreSlice(Slice.this);
 
             @Override
             public boolean hasNext() {

@@ -1,4 +1,10 @@
 /modbusTcpHelper/target
+/modbusRtuHelper/cmake-build-debug
+/modbusRtuHelper/cmake-build-debug-ubuntu2003
+/modbusRtuHelper/bin
+/modbusRtuHelper/lib
+/example/client/.gradle
+/example/client/build
 
 !**/HELP.md
 !**/target/

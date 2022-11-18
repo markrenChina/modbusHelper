@@ -12,7 +12,7 @@ public class Exchange {
     int address;  //相对地址
     int count;
     final CountDownLatch latch;
-    final List<Object> result = new ArrayList<>();
+    final List<Integer> result = new ArrayList<>();
 
     final ReadCallback callback;
 
@@ -52,7 +52,7 @@ public class Exchange {
         return latch;
     }
 
-    public List<Object> getResult() {
+    public List<Integer> getResult() {
         return result;
     }
 

@@ -2,6 +2,7 @@ package com.zhipuchina.model;
 
 import com.zhipuchina.exception.ModbusException;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,14 +13,42 @@ public abstract class Memory{
         this.head = head;
     }
 
-    public abstract byte[] getValue(int pos);
-    public abstract byte[] getValue(int start,int count) throws ModbusException;
-    public abstract List<Integer> getValueAsInt(int start, int count) throws ModbusException;
+    public abstract Integer getValue(int pos);
+    public abstract Integer[] getValue(int start,int count) throws ModbusException;
 
-    public abstract void setValue(int pos,byte[] val);
-    public abstract void setValue(int start,int count,byte[] val);
+    public void setValue(int pos,Integer val){
+        Slice slice = findSlice(pos);
+        if (slice != null) {
+            setValue(slice, pos, val);
+        }else {
+            throw new RuntimeException("illegal address");
+        }
+
+    }
+    protected abstract void setValue(Slice slice,int pos,Integer val);
+
+    public  void setValue(int start,int count,Integer[] val){
+        if (val.length == count) {
+            Slice slice = findSlice(start, count);
+            if (slice != null) {
+                for (int i = 0; i < count; i++) {
+                    setValue(slice,start+i,val[i]);
+                }
+                return;
+            }
+            throw new RuntimeException("illegal address");
+        }
+        throw new RuntimeException("illegal data");
+    }
+
 
     public abstract void malloc(int start,int size);
+
+
+
+    public  List<Integer> getValueAsInt(int start, int count) throws ModbusException{
+        return Arrays.asList(getValue(start,count));
+    }
 
     /**
      *
@@ -29,6 +58,7 @@ public abstract class Memory{
     public Slice findSlice(int pos){
         Iterator<Slice> iterator = head.iterator();
         Slice slice = null;
+
         while (iterator.hasNext()){
             slice = iterator.next();
             if (slice.isInThisSlice(pos)){

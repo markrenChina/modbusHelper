@@ -6,7 +6,7 @@ package com.zhipuchina.event;
 public interface BeforeEventHandler extends EventHandler{
 
     public boolean isNeedAsync();
-    public void process(Object oldValue,Object newValue);
+    public void process(Integer oldValue,Integer newValue);
 
     default public void process(){};
 }

@@ -50,9 +50,9 @@ public class SliceTest extends TestCase {
         Iterator<Slice> iterator = head.iterator();
         assertTrue(iterator.hasNext());
         assertEquals(10, head.count());
-        coil.setValue(8,new byte[]{0x01});
+        coil.setValue(8,1);
 
-        assertEquals(coil.getValue(8,1)[0],0x01);
+        assertEquals(coil.getValue(8),(Integer) 1);
 
         coil.malloc(16,9);
         iterator.next();
@@ -67,7 +67,7 @@ public class SliceTest extends TestCase {
         iterator = head.iterator();
         iterator.next();
         assertFalse(iterator.hasNext());
-        assertEquals(coil.getValue(8)[0],0x01);
+        assertEquals(coil.getValue(8),(Integer) 1);
 
     }
 }

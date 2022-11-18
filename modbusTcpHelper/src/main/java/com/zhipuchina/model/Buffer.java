@@ -4,11 +4,6 @@ import com.zhipuchina.event.EventManager;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.exec.ModbusExecutors;
-import com.zhipuchina.model.Coil;
-import com.zhipuchina.model.Memory;
-import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.model.Register;
-import com.zhipuchina.utils.ConvertTo;
 
 import java.util.List;
 
@@ -47,12 +42,12 @@ public class Buffer {
         malloc(type.getCode() * 10000 + offset, size);
     }
 
-    public static byte[] getValue(int pos) {
+    public static Integer getValue(int pos) {
         Memory buffer = getBuffer(pos);
         return buffer.getValue(pos);
     }
 
-    public static byte[] getValue(int pos, int count) throws ModbusException {
+    public static Integer[] getValue(int pos, int count) throws ModbusException {
         Memory buffer = getBuffer(pos);
         return buffer.getValue(pos, count);
     }
@@ -62,11 +57,11 @@ public class Buffer {
         return buffer.getValueAsInt(pos, count);
     }
 
-    public static byte[] getValue(MemoryTypes type, int offset) {
+    public static Integer getValue(MemoryTypes type, int offset) {
         return getValue(type.getCode() * 10000 + offset);
     }
 
-    public static byte[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
+    public static Integer[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
         return getValue(type.getCode() * 10000 + offset, count);
     }
 
@@ -74,9 +69,9 @@ public class Buffer {
         return getValueAsInt(type.getCode() * 10000 + offset, count);
     }
 
-    public static void setValue(int pos, byte[] val) throws ModbusException {
+    public static void setValue(int pos, Integer val) throws ModbusException {
         Memory buffer = getBuffer(pos);
-        byte[] oldValue = buffer.getValue(pos);
+        int oldValue = buffer.getValue(pos);
         if (EventManager.isNeedAsync(pos, 1)) {
             ModbusExecutors.exec(() -> {
                 EventManager.doBeforeEvent(pos, oldValue, val);
@@ -92,12 +87,12 @@ public class Buffer {
     }
 
     public static void setValue(int pos, boolean val) throws ModbusException {
-        setValue(pos, ConvertTo.primitive(val));
+        setValue(pos, val ? 1 : 0);
     }
 
-    public static void setValue(int pos, int count, byte[] val) throws ModbusException {
+    public static void setValue(int pos, int count, Integer[] val) throws ModbusException {
         Memory buffer = getBuffer(pos);
-        byte[] oldValue = buffer.getValue(pos, count);
+        Integer[] oldValue = buffer.getValue(pos, count);
         if (EventManager.isNeedAsync(pos, count)){
             ModbusExecutors.exec(() -> {
                 EventManager.doBeforeEvent(pos, count, oldValue, val);
@@ -111,7 +106,7 @@ public class Buffer {
         EventManager.doAfterEvent(pos, count, oldValue, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, byte[] val)throws ModbusException {
+    public static void setValue(MemoryTypes type, int offset, Integer val)throws ModbusException {
         setValue(type.getCode() * 10000 + offset, val);
     }
 
@@ -119,7 +114,7 @@ public class Buffer {
         setValue(type.getCode() * 10000 + offset, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, int count, byte[] val) throws ModbusException {
+    public static void setValue(MemoryTypes type, int offset, int count, Integer[] val) throws ModbusException {
         setValue(type.getCode() * 10000 + offset, count, val);
     }
 

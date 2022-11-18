@@ -15,11 +15,14 @@ public class OneServerFunctionReadHandler extends ServerFunctionReadTemplate {
     }
 
     @Override
-    public void process(byte[] value, byte[] out) {
+    public void process(Integer[] value, byte[] out) {
+//        for (int i = 0; i < value.length; i++) {
+//            value[i] = BitUtil.reversal(value[i]);
+//        }
+//        System.arraycopy(value,0,out,9,value.length);
         for (int i = 0; i < value.length; i++) {
-            value[i] = BitUtil.reversal(value[i]);
+            out[9 + i/8] = BitUtil.setBit(out[9 + i/8],8 - i%8,value[i]);
         }
-        System.arraycopy(value,0,out,9,value.length);
     }
 
     /**
