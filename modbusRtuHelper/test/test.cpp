@@ -12,7 +12,7 @@
 #endif
 
 int main(int argv,char* argc[]){
-    //c9::SerialPort serialPort{};
+    c9::SerialPort serialPort("/dev/test");
 //    serialPort.readAsynch([](char* data){
 //        std::cout << "Hello world" << std::endl;
 //    });
