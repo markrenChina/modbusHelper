@@ -7,7 +7,7 @@ public class BooleanArray extends BaseArray{
         this.data = new boolean[size];
     }
 
-    public boolean[] getData() {
-        return data;
+    public BooleanArray(boolean[] data) {
+        this.data = data;
     }
 }

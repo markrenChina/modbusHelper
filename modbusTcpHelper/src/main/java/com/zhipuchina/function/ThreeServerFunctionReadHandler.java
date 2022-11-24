@@ -28,7 +28,7 @@ public class ThreeServerFunctionReadHandler extends ServerFunctionReadTemplate {
     }
 
     @Override
-    public void process(Integer[] value,byte[] out) {
+    public void process(int[] value,byte[] out) {
         for (int i = 0; i < value.length; i++) {
             out[9+i*2] = BitUtil.getInt8To16(value[i]);
             out[10+i*2] = BitUtil.getInt0To8(value[i]);

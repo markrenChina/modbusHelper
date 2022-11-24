@@ -15,7 +15,7 @@ public class OneServerFunctionReadHandler extends ServerFunctionReadTemplate {
     }
 
     @Override
-    public void process(Integer[] value, byte[] out) {
+    public void process(int[] value, byte[] out) {
 //        for (int i = 0; i < value.length; i++) {
 //            value[i] = BitUtil.reversal(value[i]);
 //        }

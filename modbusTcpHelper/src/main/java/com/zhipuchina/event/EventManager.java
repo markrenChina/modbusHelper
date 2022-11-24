@@ -65,13 +65,13 @@ public class EventManager {
         }
     }
 
-    public static void doBeforeEvent(int pos, int count, Integer[] oldValue, Integer[] newValue){
+    public static void doBeforeEvent(int pos, int count, int[] oldValue, int[] newValue){
         for (int i = 0; i < count; i++) {
             doBeforeEvent(pos + i ,oldValue[i] , newValue[i]);
         }
     }
 
-    public static void doAfterEvent(int pos, Integer oldValue, Integer newValue) {
+    public static void doAfterEvent(int pos, int oldValue, int newValue) {
         List<AfterEventHandler> afterEvents = getAfterEvent(pos);
         if (afterEvents != null){
             ModbusExecutors.exec(() -> {
@@ -82,7 +82,7 @@ public class EventManager {
         }
     }
 
-    public static void doAfterEvent(int pos, int count, Integer[] oldValue, Integer[] newValue) {
+    public static void doAfterEvent(int pos, int count, int[] oldValue, int[] newValue) {
         for (int i = 0; i < count; i++) {
             doAfterEvent(pos + i, oldValue[i], newValue[i]);
         }

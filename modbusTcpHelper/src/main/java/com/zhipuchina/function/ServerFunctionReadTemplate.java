@@ -15,7 +15,7 @@ public abstract class ServerFunctionReadTemplate implements FunctionController {
     }
 
     public abstract int getOutCount(int count);
-    public abstract void process(Integer[] value, byte[] out);
+    public abstract void process(int[] value, byte[] out);
     @Override
     public byte[] serve(byte[] header, byte[] ADU, ModbusTcpBasicSession session) throws ModbusException {
         int address = ConvertTo.getInteger(ADU[1],ADU[2] );
@@ -24,7 +24,7 @@ public abstract class ServerFunctionReadTemplate implements FunctionController {
         byte[] out = new byte[9 + outCount];
         out[7] = ADU[0];
         out[8] = (byte) outCount;
-        Integer[] value = Buffer.getValue(type,address,count);
+        int[] value = Buffer.getValue(type,address,count);
         process(value, out);
         return out;
     }

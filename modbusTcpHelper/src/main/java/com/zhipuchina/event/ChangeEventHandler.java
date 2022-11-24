@@ -10,12 +10,14 @@ public class ChangeEventHandler implements AfterEventHandler{
 
     private EventHandler handler;
 
+    //入参 null 表示 any
     public ChangeEventHandler(Integer old, Integer newV, EventHandler handler) {
         this.old = old;
         this.newV = newV;
         this.handler = handler;
     }
 
+    //入参 null 表示 any
     public ChangeEventHandler(Boolean old, Boolean newV, EventHandler handler) {
         this.old = old ? 1 : 0;
         this.newV = newV ? 1 : 0;
@@ -23,8 +25,9 @@ public class ChangeEventHandler implements AfterEventHandler{
     }
 
     @Override
-    public void process(Integer oldValue, Integer newValue) {
-        if (old.equals(oldValue) && newV.equals(newValue)){
+    public void process(int oldValue, int newValue) {
+        if ( (old == null || old.equals(oldValue))
+                && (newV == null || newV.equals(newValue))){
             handler.process();
         }
     }

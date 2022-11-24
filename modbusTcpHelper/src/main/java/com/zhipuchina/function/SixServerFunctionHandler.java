@@ -23,9 +23,9 @@ public class SixServerFunctionHandler extends ServerFunctionWriteTemplate{
     }
 
     @Override
-    public Integer[] getValue(byte[] ADU) {
+    public int[] getValue(byte[] ADU) {
 
-        return new Integer[]{ConvertTo.getInteger(ADU[3],ADU[4])};
+        return new int[]{ConvertTo.getInteger(ADU[3],ADU[4])};
     }
 
     @Override

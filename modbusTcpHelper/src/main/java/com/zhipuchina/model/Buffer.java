@@ -42,12 +42,12 @@ public class Buffer {
         malloc(type.getCode() * 10000 + offset, size);
     }
 
-    public static Integer getValue(int pos) {
+    public static int getValue(int pos) {
         Memory buffer = getBuffer(pos);
         return buffer.getValue(pos);
     }
 
-    public static Integer[] getValue(int pos, int count) throws ModbusException {
+    public static int[] getValue(int pos, int count) throws ModbusException {
         Memory buffer = getBuffer(pos);
         return buffer.getValue(pos, count);
     }
@@ -57,11 +57,11 @@ public class Buffer {
         return buffer.getValueAsInt(pos, count);
     }
 
-    public static Integer getValue(MemoryTypes type, int offset) {
+    public static int getValue(MemoryTypes type, int offset) {
         return getValue(type.getCode() * 10000 + offset);
     }
 
-    public static Integer[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
+    public static int[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
         return getValue(type.getCode() * 10000 + offset, count);
     }
 
@@ -90,9 +90,9 @@ public class Buffer {
         setValue(pos, val ? 1 : 0);
     }
 
-    public static void setValue(int pos, int count, Integer[] val) throws ModbusException {
+    public static void setValue(int pos, int count, int[] val) throws ModbusException {
         Memory buffer = getBuffer(pos);
-        Integer[] oldValue = buffer.getValue(pos, count);
+        int[] oldValue = buffer.getValue(pos, count);
         if (EventManager.isNeedAsync(pos, count)){
             ModbusExecutors.exec(() -> {
                 EventManager.doBeforeEvent(pos, count, oldValue, val);
@@ -114,7 +114,7 @@ public class Buffer {
         setValue(type.getCode() * 10000 + offset, val);
     }
 
-    public static void setValue(MemoryTypes type, int offset, int count, Integer[] val) throws ModbusException {
+    public static void setValue(MemoryTypes type, int offset, int count, int[] val) throws ModbusException {
         setValue(type.getCode() * 10000 + offset, count, val);
     }
 

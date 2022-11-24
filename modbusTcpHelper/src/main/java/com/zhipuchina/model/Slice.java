@@ -19,6 +19,7 @@ public class Slice {
         this.start = start;
         this.end = end;
         this.next = next;
+        this.data = data;
     }
 
     public int count(){

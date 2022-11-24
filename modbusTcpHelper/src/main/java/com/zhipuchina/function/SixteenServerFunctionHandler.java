@@ -18,9 +18,9 @@ public class SixteenServerFunctionHandler extends ServerFunctionWriteTemplate{
     }
 
     @Override
-    public Integer[] getValue(byte[] ADU) {
+    public int[] getValue(byte[] ADU) {
         int count = ConvertTo.getShort(ADU[3],ADU[4]);
-        Integer[] value = new Integer[count];
+        int[] value = new int[count];
         for (int i = 0; i < count; i++) {
             value[i] = ConvertTo.getInteger(ADU[6+i*2],ADU[7+i*2]);
         }

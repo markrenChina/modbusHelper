@@ -23,9 +23,9 @@ public class FifteenServerFunctionHandler extends ServerFunctionWriteTemplate {
     }
 
     @Override
-    public Integer[] getValue(byte[] ADU) {
+    public int[] getValue(byte[] ADU) {
         int count = ConvertTo.getInteger(ADU[3], ADU[4]);
-        Integer[] value = new Integer[count];
+        int[] value = new int[count];
         for (int i = 0; i < count; i++) {
             value[i] = BitUtil.getBit(ADU[6 + i /8],8 - i%8 ) ? 1 :0;
         }

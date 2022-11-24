@@ -5,6 +5,7 @@ import com.zhipuchina.exception.ModbusException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Memory{
     protected Slice head;
@@ -13,10 +14,10 @@ public abstract class Memory{
         this.head = head;
     }
 
-    public abstract Integer getValue(int pos);
-    public abstract Integer[] getValue(int start,int count) throws ModbusException;
+    public abstract int getValue(int pos);
+    public abstract int[] getValue(int start,int count) throws ModbusException;
 
-    public void setValue(int pos,Integer val){
+    public void setValue(int pos,int val){
         Slice slice = findSlice(pos);
         if (slice != null) {
             setValue(slice, pos, val);
@@ -25,9 +26,9 @@ public abstract class Memory{
         }
 
     }
-    protected abstract void setValue(Slice slice,int pos,Integer val);
+    protected abstract void setValue(Slice slice,int pos,int val);
 
-    public  void setValue(int start,int count,Integer[] val){
+    public  void setValue(int start,int count,int[] val){
         if (val.length == count) {
             Slice slice = findSlice(start, count);
             if (slice != null) {
@@ -47,7 +48,7 @@ public abstract class Memory{
 
 
     public  List<Integer> getValueAsInt(int start, int count) throws ModbusException{
-        return Arrays.asList(getValue(start,count));
+        return Arrays.stream(getValue(start,count)).boxed().collect(Collectors.toList());
     }
 
     /**

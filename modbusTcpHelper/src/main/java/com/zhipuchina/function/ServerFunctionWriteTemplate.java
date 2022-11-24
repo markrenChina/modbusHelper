@@ -14,14 +14,14 @@ public abstract class ServerFunctionWriteTemplate implements FunctionController{
         this.type = type;
     }
 
-    public abstract Integer[] getValue(byte[] ADU);
+    public abstract int[] getValue(byte[] ADU);
     public abstract int getCount(byte[] ADU);
 
     @Override
     public byte[] serve(byte[] header, byte[] ADU, ModbusTcpBasicSession session) throws ModbusException {
         //地址
         int address = ConvertTo.getShort(ADU[1],ADU[2]);
-        Integer[] value = getValue(ADU);
+        int[] value = getValue(ADU);
         //写入
         Buffer.setValue(type,address,getCount(ADU),value);
         byte[] out = new byte[12];

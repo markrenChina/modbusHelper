@@ -10,23 +10,23 @@ public class Coil extends Memory {
     }
 
     @Override
-    public Integer getValue(int pos) {
+    public int getValue(int pos) {
         Slice slice = findSlice(pos);
         if (slice != null) {
-            boolean data = (boolean) slice.data[pos - slice.start];
+            boolean data =((BooleanArray)slice.data).data[pos - slice.start];
             if (data){
                 return 1;
             }else {
                 return 0;
             }
         } else {
-            return null;
+            throw new RuntimeException("IllegalAddressException");
         }
     }
 
     public int getValue(Slice slice,int pos){
         if (slice != null && slice.isInThisSlice(pos)){
-            return ((boolean)slice.data[pos - slice.start]) ? 1 : 0;
+            return (((BooleanArray)slice.data).data[pos - slice.start]) ? 1 : 0;
         }else {
             throw new ArrayIndexOutOfBoundsException();
         }
@@ -34,12 +34,12 @@ public class Coil extends Memory {
 
     //todo 优化为System.arrayCopy
     @Override
-    public Integer[] getValue(int start, int count) throws ModbusException {
+    public int[] getValue(int start, int count) throws ModbusException {
         Slice slice = findSlice(start);
         if (slice == null || (slice.end + 1) < (start + count)){
             throw ModbusExceptionFactory.create(2);
         }
-        Integer[] res = new Integer[count];
+        int[] res = new int[count];
         for (int i = 0; i < count; i++) {
             res[i] =  getValue(slice,start + i);
         }
@@ -61,8 +61,8 @@ public class Coil extends Memory {
 
 
     @Override
-    protected void setValue(Slice slice, int pos, Integer val) {
-        ((BooleanArray)slice.data).getData()[pos - slice.start] =(val == 0x01);
+    protected void setValue(Slice slice, int pos, int val) {
+        ((BooleanArray)slice.data).data[pos - slice.start] =(val == 0x01);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Coil extends Memory {
             for (int i = start; i <= end ; i++) {
                 Slice tmp = findSlice(i);
                 if (tmp != null){
-                    System.arraycopy(tmp.data,0,data,i,tmp.count());
+                    System.arraycopy(((BooleanArray)tmp.data).data,0,data,i,tmp.count());
 //                    byte[] value = getValue(tmp.start, tmp.count());
                     i = tmp.end;
                 }else {
@@ -92,14 +92,15 @@ public class Coil extends Memory {
                     if (tmp == null){
                         break;
                     }else if(tmp.start <= end) {
-                        System.arraycopy(tmp.data,0,data,tmp.start - start -1,tmp.count());
+                        System.arraycopy(((BooleanArray)tmp.data).data,0,data,tmp.start - start -1,tmp.count());
                         i = tmp.end;
                     }
                 }
             }
             Slice pre = findPreSlice(start);
             Slice aft = findAfterSlice(end);
-            Slice slice = new Slice(start, end, data,aft);
+            BooleanArray boola = new BooleanArray(data);
+            Slice slice = new Slice(start, end, boola,aft);
             Slice tmp = (pre == null) ? head : pre;
             while (tmp != aft){
                 Slice tmp2 = tmp;

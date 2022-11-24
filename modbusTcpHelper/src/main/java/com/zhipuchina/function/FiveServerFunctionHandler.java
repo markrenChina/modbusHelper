@@ -1,7 +1,6 @@
 package com.zhipuchina.function;
 
 import com.zhipuchina.model.MemoryTypes;
-import com.zhipuchina.utils.ConvertTo;
 
 /**
  * 写单个线圈
@@ -22,8 +21,8 @@ public class FiveServerFunctionHandler extends ServerFunctionWriteTemplate{
     }
 
     @Override
-    public Integer[] getValue(byte[] ADU) {
-        return new Integer[]{ConvertTo.getInteger(ADU[3],ADU[4])};
+    public int[] getValue(byte[] ADU) {
+        return new int[] { (ADU[3] &0xFF) >> 7};
     }
 
     @Override
