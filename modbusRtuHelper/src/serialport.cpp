@@ -12,13 +12,13 @@ namespace c9 {
         return fd = openSerial(path.c_str(), baudrate, stopBits, dataBits, parity, flowCon, flags);
     }
 
-    SerialPort::SerialPort(const std::string &path) : path(path) {}
+    C9_EXPORTS SerialPort::SerialPort(const std::string &path) : path(path) {}
 
-    SerialPort::SerialPort(const std::string &path, int baudrate, int stopBits, int dataBits, int parity, int flowCon,
+    C9_EXPORTS SerialPort::SerialPort(const std::string &path, int baudrate, int stopBits, int dataBits, int parity, int flowCon,
                            int flags) : path(path), baudrate(baudrate), stopBits(stopBits), dataBits(dataBits),
                                         parity(parity), flowCon(flowCon), flags(flags) {}
 
-    void SerialPort::close() const {
+    C9_EXPORTS void SerialPort::close() const {
         if (fd != -1) {
             closeSerial(fd);
         }
@@ -27,8 +27,8 @@ namespace c9 {
 
 #ifdef WIN32
 
-    ssize_t SerialPort::read(char *buffer, uint32_t size) {
-        OVERLAPPED m_osRead = {0};
+    C9_EXPORTS ssize_t readSerial(int fd,char *buffer, uint32_t size) {
+        OVERLAPPED m_osRead;
         memset(&m_osRead, 0, sizeof m_osRead);
         m_osRead.hEvent = CreateEventA(nullptr, TRUE, FALSE, "READ Event");
         BOOL readStat = ReadFile((HANDLE) _get_osfhandle(fd), buffer, size, nullptr, &m_osRead);
@@ -40,12 +40,12 @@ namespace c9 {
         return m_osRead.InternalHigh;
     }
 
-    void SerialPort::write(char *data, int size) const {
+    C9_EXPORTS void writeSerial(int fd,char *data, int size) {
         DWORD dword = 0;
         OVERLAPPED m_osWrite;
         memset(&m_osWrite, 0, sizeof m_osWrite);
         m_osWrite.hEvent = CreateEventA(nullptr, TRUE, FALSE, "WRITE Event");
-        BOOL writeState = WriteFile(reinterpret_cast<void *>(fd), data, size, &dword, &m_osWrite);
+        BOOL writeState = WriteFile((HANDLE) _get_osfhandle(fd), data, size, &dword, &m_osWrite);
         if (!writeState) {
             if (GetLastError() == ERROR_IO_PENDING) {
                 WaitForSingleObject(m_osWrite.hEvent, 1000);
@@ -54,26 +54,34 @@ namespace c9 {
     }
 
 #else
-    ssize_t SerialPort::read(char *buffer, uint32_t size) {
+    ssize_t readSerial(int fd,char *buffer, uint32_t size) {
         return ::read(fd,buffer,size);
     }
 
-    void SerialPort::write(char *data,int size) const {
+    void writeSerial(int fd,char *data,int size)  {
         ::write(fd,data,size);
     }
 
 #endif
 
-    void SerialPort::read(std::function<void(std::string)> mCb) {
+    C9_EXPORTS void SerialPort::read(std::function<void(std::string)> mCb) {
         char *buffer = new char[3048];
         while (read(buffer, 3048) != EOF) {
             mCb(buffer);
         }
     }
 
+    ssize_t SerialPort::read(char *buffer, uint32_t size) const {
+        return readSerial(fd,buffer,size);
+    }
+
+    void SerialPort::write(char *data, int size) const {
+        writeSerial(fd,data,size);
+    }
+
 #ifdef WIN32
 
-    void closeSerial(int fd) {
+    C9_EXPORTS void closeSerial(int fd) {
         CloseHandle(reinterpret_cast<HANDLE>(_get_osfhandle(fd)));
     }
 
@@ -159,6 +167,8 @@ namespace c9 {
             dcb.fNull = FALSE;            //停用null stripping
             dcb.fAbortOnError = FALSE;    //串口发送错误，并不终止串口读写
             if (!SetCommState(fd, &dcb)) {
+                DWORD error = GetLastError();
+                std::cerr << "SetCommState error: "  << error << std::endl;
                 return -4;
             }
             //超时参数
