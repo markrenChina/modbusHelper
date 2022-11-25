@@ -11,10 +11,20 @@
 #define PLATFORM 2;   //other
 #endif
 
+#ifdef WIN32
 int main(int argv,char* argc[]){
-    c9::SerialPort serialPort("/dev/test");
-//    serialPort.readAsynch([](char* data){
-//        std::cout << "Hello world" << std::endl;
+    c9::SerialPort serialPort("/");
+//    serialPort.read([](const std::string& data){
+//        std::cout << data << std::endl;
 //    });
     std::cout << PLATFORM ;
 }
+#else
+int main(int argv,char* argc[]){
+    c9::SerialPort serialPort("/dev/test");
+//    serialPort.read([](const std::string& data){
+//        std::cout << data << std::endl;
+//    });
+    std::cout << PLATFORM ;
+}
+#endif

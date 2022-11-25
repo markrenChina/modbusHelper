@@ -26,10 +26,10 @@ namespace c9{
     public:
         uint64_t open();
         void close() const;
-        void read(char * buffer ,uint32_t size);
-        void read(std::function<void(char *)> mCb);
+        ssize_t read(char * buffer ,uint32_t size);
+        void read(std::function<void(std::string)> mCb);
 
-        void write(char* data);
+        void write(char* data,int size) const;
     private:
         int fd;
         std::string path;

@@ -9,7 +9,7 @@ namespace c9 {
 
     uint64_t
     SerialPort::open() {
-        return fd = openSerial(path.c_str(),baudrate,stopBits,dataBits,parity,flowCon,flags);
+        return fd = openSerial(path.c_str(), baudrate, stopBits, dataBits, parity, flowCon, flags);
     }
 
     SerialPort::SerialPort(const std::string &path) : path(path) {}
@@ -25,20 +25,54 @@ namespace c9 {
     }
 
 
+#ifdef WIN32
 
-    void SerialPort::read(char *buffer, uint32_t size) {
-
+    ssize_t SerialPort::read(char *buffer, uint32_t size) {
+        OVERLAPPED m_osRead = {0};
+        memset(&m_osRead, 0, sizeof m_osRead);
+        m_osRead.hEvent = CreateEventA(nullptr, TRUE, FALSE, "READ Event");
+        BOOL readStat = ReadFile((HANDLE) _get_osfhandle(fd), buffer, size, nullptr, &m_osRead);
+        if (!readStat) {
+            if (GetLastError() == ERROR_IO_PENDING) {
+                WaitForSingleObject(m_osRead.hEvent, INFINITE);
+            }
+        }
+        return m_osRead.InternalHigh;
     }
 
-    void SerialPort::read(std::function<void(char *)> mCb) {
-
+    void SerialPort::write(char *data, int size) const {
+        DWORD dword = 0;
+        OVERLAPPED m_osWrite;
+        memset(&m_osWrite, 0, sizeof m_osWrite);
+        m_osWrite.hEvent = CreateEventA(nullptr, TRUE, FALSE, "WRITE Event");
+        BOOL writeState = WriteFile(reinterpret_cast<void *>(fd), data, size, &dword, &m_osWrite);
+        if (!writeState) {
+            if (GetLastError() == ERROR_IO_PENDING) {
+                WaitForSingleObject(m_osWrite.hEvent, 1000);
+            }
+        }
     }
 
-    void SerialPort::write(char *data) {
+#else
+    ssize_t SerialPort::read(char *buffer, uint32_t size) {
+        return ::read(fd,buffer,size);
+    }
 
+    void SerialPort::write(char *data,int size) const {
+        ::write(fd,data,size);
+    }
+
+#endif
+
+    void SerialPort::read(std::function<void(std::string)> mCb) {
+        char *buffer = new char[3048];
+        while (read(buffer, 3048) != EOF) {
+            mCb(buffer);
+        }
     }
 
 #ifdef WIN32
+
     void closeSerial(int fd) {
         CloseHandle(reinterpret_cast<HANDLE>(_get_osfhandle(fd)));
     }
@@ -85,7 +119,7 @@ namespace c9 {
                 case 6:
                 case 7:
                 case 8: {
-                    dcb.ByteSize = (BYTE)dataBits;
+                    dcb.ByteSize = (BYTE) dataBits;
                     break;
                 }
                 default: {
@@ -110,7 +144,7 @@ namespace c9 {
                     break;
             }
             //停止位
-            dcb.StopBits = (BYTE)stopBits;
+            dcb.StopBits = (BYTE) stopBits;
             //todo 通过flowCon 设置下面的
             dcb.fDtrControl = DTR_CONTROL_DISABLE;//DTR控制
             dcb.fRtsControl = RTS_CONTROL_DISABLE;//RTS控制

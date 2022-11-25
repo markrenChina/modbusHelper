@@ -23,6 +23,8 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #include <io.h>
+#include <BaseTsd.h>
+typedef SIZE_T ssize_t;
 #define C9_EXPORTS __declspec(dllexport)
 #else
 #include <termios.h>

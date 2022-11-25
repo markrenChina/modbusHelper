@@ -35,7 +35,7 @@ jint JNI_OnLoad(JavaVM *vm,void *reserved) {
     };
     Jvm = vm;
     assert(env != nullptr);
-    jclass j_class = env->FindClass("com/ccand99/SerialPortImpl");
+    jclass j_class = env->FindClass("com/ccand99/serialport/SerialPortImpl");
     //jmethodID m = env->GetStaticMethodID(j_class,"postData", "(Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;DLjava/lang/String;)Ljava/lang/String;"
     JNINativeMethod methods[] = {
                 {const_cast<char *>("nativeOpen"),
