@@ -5,7 +5,6 @@
 #include "serialport.h"
 
 namespace c9 {
-    //SerialPort::Callback::Callback(const std::function<void(char *)> &mCb) : m_cb(mCb) {}
 
     uint64_t
     SerialPort::open() {
@@ -36,6 +35,8 @@ namespace c9 {
             if (GetLastError() == ERROR_IO_PENDING) {
                 WaitForSingleObject(m_osRead.hEvent, INFINITE);
             }
+        }else {
+            return EOF;
         }
         return m_osRead.InternalHigh;
     }
@@ -65,8 +66,8 @@ namespace c9 {
 #endif
 
     C9_EXPORTS void SerialPort::read(std::function<void(std::string)> mCb) {
-        char *buffer = new char[3048];
-        while (read(buffer, 3048) != EOF) {
+        char *buffer = new char[3036];
+        while (read(buffer, 3036) != EOF) {
             mCb(buffer);
         }
     }
@@ -98,7 +99,7 @@ namespace c9 {
         }
         fd = CreateFileA(
                 path,
-                GENERIC_READ | GENERIC_WRITE,
+                GENERIC_READ | GENERIC_WRITE | flags,
                 0,//禁止其他程序读写
                 nullptr,
                 OPEN_EXISTING,//如果存在就打开
@@ -246,11 +247,11 @@ namespace c9 {
 
     int openSerial(const char *path, int baudrate, int stopBits, int dataBits, int parity, int flowCon, int flags) {
         int fd;
-        uint64_t speed;
+        speed_t speed;
 /* Check arguments */
         {
-            speed = getBaudrate(baudrate);
-            if (speed == (uint64_t)-1) {
+            speed = (speed_t)getBaudrate(baudrate);
+            if (speed == (speed_t)-1) {
                 std::cerr << "INVALID BAUDRATE" << std::endl;
                 return -1;
             }

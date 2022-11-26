@@ -27,9 +27,11 @@ int java_nativeOpen(JNIEnv *env, jobject thiz, jstring path, jint baudrate,
 void java_nativeClose(JNIEnv *env, jobject thiz, int fd);
 
 void java_nativeWrite(JNIEnv *env, jobject thiz,jint fd,jbyteArray jb);
-int java_nativeRead(JNIEnv *env, jobject thiz,jint fd, jbyteArray jb);
+jbyteArray java_nativeRead(JNIEnv *env, jobject thiz,jint fd);
+jbyteArray java_nativeReadNBytes(JNIEnv *env, jobject thiz,jint fd,jsize len);
+void java_nativeReadCallBack(JNIEnv *env, jobject thiz,jint fd,jobject callback);
 
-char* jbyteArray2charArray(JNIEnv *env,jbyteArray &_bytes);
+//std::string jbyteArray2charArray(JNIEnv *env,jbyteArray &_bytes);
 
 
 jint JNI_OnLoad(JavaVM *vm,void *reserved) {
@@ -51,7 +53,12 @@ jint JNI_OnLoad(JavaVM *vm,void *reserved) {
                 {(char *)"nativeWrite",
                         (char *)"(I[B)V",(void *) java_nativeWrite},
                 {(char *)"nativeRead",
-                        (char *)"(I[B)I",(void *) java_nativeRead}
+                        (char *)"(I)[B",(void *) java_nativeRead},
+                {(char *)"nativeReadNBytes",
+                        (char *)"(II)[B",(void *) java_nativeReadNBytes},
+                {(char *)"nativeReadCallBack",
+                        (char *)"(ILcom/ccand99/serialport/SerialPortReadCallback;)V",
+                        (void *) java_nativeReadCallBack},
 
     };
     env->RegisterNatives(j_class, methods, sizeof(methods) / sizeof(JNINativeMethod));

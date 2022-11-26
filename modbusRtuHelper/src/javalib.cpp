@@ -7,7 +7,6 @@
 int java_nativeOpen
         (JNIEnv *env, jobject thiz, jstring path, jint baudrate, jint stopBits, jint dataBits,
          jint parity, jint flowCon, jint flags) {
-    jobject mFileDescriptor;
     const char *path_utf = (*env).GetStringUTFChars(path, nullptr);
     int fd = c9::openSerial(path_utf, baudrate, stopBits, dataBits, parity, flowCon, flags);
     (*env).ReleaseStringUTFChars(path, path_utf);
@@ -22,28 +21,62 @@ void java_nativeClose(JNIEnv *env, jobject thiz, int fd) {
 
 void java_nativeWrite(JNIEnv *env, jobject thiz,jint fd, jbyteArray jb){
     //c9::
-    uint64_t dword = 0;
     int len = env ->GetArrayLength(jb);
-    char* data = jbyteArray2charArray(env,jb);
-    c9::writeSerial((int)fd,data,len);
+    std::string data;
+    data.resize(len);
+    env->GetByteArrayRegion(jb,0,len,(jbyte *)(&data[0]));
+    c9::writeSerial((int)fd,&data[0],len);
+    env->DeleteLocalRef(jb);
 }
 
-int java_nativeRead(JNIEnv *env, jobject thiz,jint fd, jbyteArray jb){
-    return 0;
+jbyteArray java_nativeRead(JNIEnv *env, jobject thiz,jint fd){
+    std::string cByte;
+    cByte.resize(3036);
+    jsize bk = (jsize)c9::readSerial((int)fd,&(cByte[0]),3036);
+    //std::cout <<"bk = " << bk << std::endl;
+    jbyteArray jb = env->NewByteArray(bk);
+    env->SetByteArrayRegion(jb,0,bk,(jbyte *)(&cByte[0]));
+    //env->DeleteLocalRef(jb);
+    return jb;
 }
 
-char* jbyteArray2charArray(JNIEnv *env,jbyteArray &_bytes){
-    //jbyte * bBuffer = env ->GetByteArrayElements(_bytes,nullptr);
-    char *chars = nullptr;
-    jbyte *bytes;
-    bytes = env->GetByteArrayElements(_bytes, nullptr);
-    int chars_len = env->GetArrayLength(_bytes);
-    chars = new char[chars_len + 1];
-    memset(chars,0,chars_len + 1);
-    memcpy(chars, bytes, chars_len);
-    chars[chars_len] = 0;
-    env->ReleaseByteArrayElements(_bytes, bytes, 0);
-    return chars;
+jbyteArray java_nativeReadNBytes(JNIEnv *env, jobject thiz,jint fd,jsize len){
+    jsize readed = 0;
+    std::string cByte;
+    cByte.resize(len);
+    int tmp = 0;
+    while ( readed != len ){
+        tmp = (int)c9::readSerial(fd,&(cByte[readed]),len-readed);
+        if (tmp == EOF){
+            jbyteArray jb = env->NewByteArray(readed);
+            env->SetByteArrayRegion(jb,0,readed,(jbyte *)(&cByte[0]));
+            return jb;
+        }else {
+            readed += tmp;
+        }
+    }
+    jbyteArray jb = env->NewByteArray(readed);
+    env->SetByteArrayRegion(jb,0,readed,(jbyte *)(&cByte[0]));
+    return jb;
 }
+
+void java_nativeReadCallBack(JNIEnv *env, jobject thiz,jint fd,jobject callback){
+    jbyteArray jb = java_nativeRead(env,thiz,fd);
+    jclass jc = env->GetObjectClass(callback);
+    jmethodID jmId = env->GetMethodID(jc,"recv","([B)V");
+    env->CallVoidMethod(thiz,jmId,jb);
+    env->DeleteLocalRef(jc);
+}
+
+//std::string jArray2cArray(JNIEnv *env,jbyteArray &_bytes){
+//    jbyte *bytes;
+//    bytes = env->GetByteArrayElements(_bytes, nullptr);
+//    int chars_len = env->GetArrayLength(_bytes);
+//    std::string chars;
+//    chars.resize(chars_len);
+//    memcpy(&(chars[0]), bytes, chars_len);
+//    env->ReleaseByteArrayElements(_bytes, bytes, JNI_COMMIT);
+//    return chars;
+//}
 
 

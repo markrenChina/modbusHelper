@@ -32,7 +32,7 @@ namespace c9{
         /**
          * 同步读取
          * @param buffer 缓存区
-         * @param size  推荐读取大小
+         * @param size  缓冲区大小
          * @return 实际读取的大小
          */
         C9_EXPORTS ssize_t read(char * buffer ,uint32_t size) const;
@@ -47,7 +47,7 @@ namespace c9{
         int dataBits = 8;
         int parity = 0;
         int flowCon = 0;
-        int flags;
+        int flags = 0;
     };
 }
 

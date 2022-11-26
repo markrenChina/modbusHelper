@@ -40,7 +40,7 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 add_library(modbusRtuHelper SHARED ${ROOT_SRC})
 
-add_executable(test-all  ${PROJECT_SOURCE_DIR}/test/test.cpp )
-TARGET_LINK_LIBRARIES(test-all modbusRtuHelper)
+add_executable(test-serialport ${PROJECT_SOURCE_DIR}/test/test_serialport.cpp)
+TARGET_LINK_LIBRARIES(test-serialport modbusRtuHelper)
 
 
