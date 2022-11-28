@@ -30,7 +30,7 @@ public class Register extends Memory {
             int index = start - slice.start;
             int[] res = new int[count];
             for (int i = 0; i < count; i++) {
-                res[i] =  ConvertTo.getInteger(((ByteArray)slice.data).data[i * 2],((ByteArray)slice.data).data[i * 2 + 1]);
+                res[i] =  ConvertTo.getInteger(((ByteArray)slice.data).data[(i+index) * 2 ],((ByteArray)slice.data).data[(i+index) *2 + 1]);
             }
 //            System.arraycopy(slice.data, index * 2, res, 0, count * 2);
             return res;

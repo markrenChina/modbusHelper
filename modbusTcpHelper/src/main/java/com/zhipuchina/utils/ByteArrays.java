@@ -22,6 +22,21 @@ public class ByteArrays {
         return sb.toString();
     }
 
+    public static String toString(int[] bytes){
+        StringBuilder sb = new StringBuilder();
+        sb.append("HEX:[");
+        for (int b : bytes) {
+            int pre = ((byte)b & 0xF0) >> 4;
+            int last = (byte)b & 0x0F;
+            sb.append(hexChar[pre]).append(hexChar[last]).append(',');
+        }
+        if (bytes.length > 0){
+            sb.deleteCharAt(sb.length()-1);
+        }
+        sb.append(']');
+        return sb.toString();
+    }
+
 
     public static void main(String[] args) {
         byte[] test1 = new byte[]{};

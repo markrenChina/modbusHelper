@@ -1,10 +1,14 @@
 package com.zhipuchina.model;
 
 import com.zhipuchina.event.EventManager;
+import com.zhipuchina.exception.IllegalDataAddressException;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.exec.ModbusExecutors;
+import com.zhipuchina.utils.BitUtil;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 public class Buffer {
@@ -63,6 +67,28 @@ public class Buffer {
 
     public static int[] getValue(MemoryTypes type, int offset, int count) throws ModbusException {
         return getValue(type.getCode() * 10000 + offset, count);
+    }
+
+    public static String getString(MemoryTypes type, int offset, int count) throws ModbusException {
+        int[] value = getValue(type.getCode() * 10000 + offset, count);
+        int i = 0;
+        for (; i < value.length; i++) {
+            if (BitUtil.getInt8To16(value[i]) == '\0' || BitUtil.getInt0To8(value[i]) == '\0'){
+                break;
+            }
+        }
+        value = Arrays.copyOf(value,i);
+        return new String(BitUtil.intLow2ByteToByteArray(value),StandardCharsets.US_ASCII);
+    }
+
+    public static void setString(MemoryTypes type, int offset,int count ,String val) throws ModbusException {
+        if (type == MemoryTypes.HoldingRegister || type == MemoryTypes.InputRegister){
+            int[] value = BitUtil.byteArray2ByteTo1IntArray(val.getBytes(StandardCharsets.US_ASCII));
+            value = Arrays.copyOf(value,count);
+            setValue(type,offset,value.length,value);
+        }else {
+            throw new IllegalDataAddressException();
+        }
     }
 
     public static List<Integer> getValueAsInt(MemoryTypes type, int offset, int count) throws ModbusException {
@@ -174,5 +200,11 @@ public class Buffer {
 //            outputRegisterBuffer.get(offset + i).setValue((short) v);
 //        }
 //    }
+
+    public static void main(String[] args) throws ModbusException {
+        malloc(MemoryTypes.HoldingRegister,1,15);
+        setString(MemoryTypes.HoldingRegister,1,15,"hz10000021255");
+        System.out.println(getString(MemoryTypes.HoldingRegister,1,15));
+    }
 }
 

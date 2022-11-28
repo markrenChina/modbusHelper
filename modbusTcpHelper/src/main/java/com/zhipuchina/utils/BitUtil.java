@@ -14,6 +14,29 @@ public class BitUtil {
             0xF7, 0xFB, 0xFD, 0xFE
     };
 
+    public static byte[] intLow2ByteToByteArray(int[] val){
+        byte[] res = new byte[val.length * 2];
+        for (int i = 0; i < val.length ; i++) {
+            res[i*2] = getInt8To16(val[i]);
+            res[i*2 +1] = getInt0To8(val[i]);
+        }
+        return res;
+    }
+
+    public static int[] byteArray2ByteTo1IntArray(byte[] val){
+        int alone =  val.length % 2;
+        int[] res = new int[val.length / 2 + alone];
+        for (int i = 0; i < res.length - 1 ; i++) {
+            res[i] = ConvertTo.getInteger(val[i*2],val[i*2+1]);
+        }
+        if (alone == 0){
+            res[res.length - 1] = ConvertTo.getInteger(val[val.length-2],val[val.length -1]);
+        }else{
+            res[res.length - 1] = ConvertTo.getInteger(val[val.length-1],(byte) 0x00);
+        }
+        return res;
+    }
+
     /**
      * count 范围1~8，byte从左往右算起
      */
