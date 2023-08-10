@@ -5,6 +5,7 @@ import com.zhipuchina.exception.IllegalDataAddressException;
 import com.zhipuchina.exception.ModbusException;
 import com.zhipuchina.exception.ModbusExceptionFactory;
 import com.zhipuchina.exec.ModbusExecutors;
+import com.zhipuchina.handler.GlobalLogger;
 import com.zhipuchina.utils.BitUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -70,6 +71,7 @@ public class Buffer {
     }
 
     public static String getString(MemoryTypes type, int offset, int count) throws ModbusException {
+        GlobalLogger.logger.debug("getString pos = "+(type.getCode()* 10000 + offset)+ ",count =" + count);
         int[] value = getValue(type.getCode() * 10000 + offset, count);
         int i = 0;
         for (; i < value.length; i++) {
@@ -82,6 +84,7 @@ public class Buffer {
     }
 
     public static void setString(MemoryTypes type, int offset,int count ,String val) throws ModbusException {
+        GlobalLogger.logger.debug("setString pos = "+(type.getCode()* 10000 + offset)+ ",count =" + count);
         if (type == MemoryTypes.HoldingRegister || type == MemoryTypes.InputRegister){
             int[] value = BitUtil.byteArray2ByteTo1IntArray(val.getBytes(StandardCharsets.US_ASCII));
             value = Arrays.copyOf(value,count);
@@ -96,6 +99,7 @@ public class Buffer {
     }
 
     public static void setValue(int pos, Integer val) throws ModbusException {
+        GlobalLogger.logger.debug("setValue pos = "+pos+ ",val =" + val);
         Memory buffer = getBuffer(pos);
         int oldValue = buffer.getValue(pos);
         if (EventManager.isNeedAsync(pos, 1)) {
@@ -117,6 +121,7 @@ public class Buffer {
     }
 
     public static void setValue(int pos, int count, int[] val) throws ModbusException {
+        GlobalLogger.logger.debug("setValue int array pos = "+pos+ ",count =" + count);
         Memory buffer = getBuffer(pos);
         int[] oldValue = buffer.getValue(pos, count);
         if (EventManager.isNeedAsync(pos, count)){

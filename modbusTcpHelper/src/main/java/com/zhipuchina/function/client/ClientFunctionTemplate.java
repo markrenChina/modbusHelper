@@ -14,7 +14,7 @@ public abstract class ClientFunctionTemplate implements FunctionController {
     @Override
     public byte[] serve(byte[] header, byte[] ADU, ModbusTcpBasicSession session) throws ModbusException {
         int id = ConvertTo.getInteger(header[0], header[1]);
-        var exchange = session.getConcurrentMap().get(id);
+        Exchange exchange = session.getConcurrentMap().get(id);
         if (exchange == null) {
             return null;
         }

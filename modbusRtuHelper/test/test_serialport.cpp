@@ -16,7 +16,8 @@
 int main(int argv,char* argc[]){
     std::cout <<  (PLATFORM == 1 ? "Windows" : "Linux") << std::endl;
 //    c9::SerialPort serialPort("\\\\.\\COM11");
-    c9::SerialPort serialPort("COM6");
+//    c9::SerialPort serialPort("\\\\.\\COM22");
+    c9::SerialPort serialPort("COM22");
     serialPort.open();
     serialPort.write("hello world", sizeof("hello world"));
 //    serialPort.read([](const std::string& data){
@@ -31,7 +32,7 @@ int main(int argv,char* argc[]){
 }
 #else
 int main(int argv,char* argc[]){
-    std::cout <<  (PLATFORM == 1 ? "Windows" : "Linux") << std::endl;
+    std::cout <<  ((PLATFORM == 1) ? "Windows" : "Linux") << std::endl;
     c9::SerialPort serialPort("/dev/ttyUART_485_2");
     std::string readBuff;
     readBuff.resize(100);

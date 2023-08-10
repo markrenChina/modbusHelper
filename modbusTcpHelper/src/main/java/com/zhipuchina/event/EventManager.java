@@ -1,6 +1,7 @@
 package com.zhipuchina.event;
 
 import com.zhipuchina.exec.ModbusExecutors;
+import com.zhipuchina.handler.GlobalLogger;
 import com.zhipuchina.model.MemoryTypes;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class EventManager {
     }
 
     public static void doBeforeEvent(int pos, Integer oldValue, Integer newValue)  {
+        GlobalLogger.logger.debug("doBeforeEvent pos = "+pos+ ",old val =" + oldValue +",new val="+ newValue);
         BeforeEventHandler beforeEvent = getBeforeEvent(pos);
         if (beforeEvent != null){
             beforeEvent.process(oldValue,newValue);

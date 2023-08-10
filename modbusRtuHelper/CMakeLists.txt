@@ -13,14 +13,12 @@ if (JNI_FOUND)
 #    LINK_DIRECTORIES(${JNI_LIBRARIES})
 endif()
 
-SET(DEBUG "${CMAKE_BUILD_TYPE} STREQUAL Debug")
-message (STATUS "cmake build ${CMAKE_BUILD_TYPE}")
 
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/src ROOT_SRC)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(DEBUG)
+    if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
         set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O0 -g -Wall -Wno-deprecated -Werror -Wno-unused-function")
     else()
         set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -g -Wall -Wno-deprecated -Werror -Wno-unused-function")
@@ -34,13 +32,15 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 
 add_library(modbusRtuHelper SHARED ${ROOT_SRC})
 
-add_executable(test-serialport ${PROJECT_SOURCE_DIR}/test/test_serialport.cpp)
-TARGET_LINK_LIBRARIES(test-serialport modbusRtuHelper)
+add_library(serialPort SHARED src/serialport.cpp)
+
+add_executable(test-serialport test/test_serialport.cpp)
+TARGET_LINK_LIBRARIES(test-serialport serialPort)
 
 

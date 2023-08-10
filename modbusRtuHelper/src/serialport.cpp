@@ -3,6 +3,7 @@
 //
 #include "modbus.h"
 #include "serialport.h"
+#include <string>
 
 namespace c9 {
 
@@ -86,6 +87,23 @@ namespace c9 {
         CloseHandle(reinterpret_cast<HANDLE>(_get_osfhandle(fd)));
     }
 
+    std::string handleComStr(const std::string& port) {
+        std::string handledPort = port;
+        try {
+            std::string numStr = port.substr(3); // Remove "COM" prefix
+            int num = std::stoi(numStr);
+            if (num >= 10) {
+                handledPort = R"(\\.\)";
+                handledPort += port;
+            }
+        }
+        catch (const std::exception& e) {
+            // Handle exception appropriately
+            std::cerr << e.what() << std::endl;
+        }
+        return handledPort;
+    }
+
     int openSerial(const char *path, int baudrate, int stopBits, int dataBits, int parity, int flowCon, int flags) {
         HANDLE fd;
         DWORD baudRate;
@@ -97,8 +115,9 @@ namespace c9 {
                 return -1;
             }
         }
-        fd = CreateFileA(
-                path,
+
+        fd = CreateFile(
+                handleComStr(path).c_str(),
                 GENERIC_READ | GENERIC_WRITE | flags,
                 0,//禁止其他程序读写
                 nullptr,
@@ -106,6 +125,10 @@ namespace c9 {
                 FILE_FLAG_OVERLAPPED,//异步方式: FILE_FLAG_OVERLAPPED
                 nullptr
         );
+        if (fd == INVALID_HANDLE_VALUE) {
+            std::cout<< "INVALID HANDLE VALUE" << std::endl;
+            return -2;
+        }
         {
             //Configure device
             //初始通信设备的参数
@@ -121,7 +144,7 @@ namespace c9 {
                 dcb.DCBlength = sizeof dcb;
             }
             //波特率
-            dcb.BaudRate = CBR_9600;
+            dcb.BaudRate = baudRate;
             //数据位
             switch (dataBits) {
                 case 5:
@@ -152,8 +175,18 @@ namespace c9 {
                     dcb.Parity = NOPARITY;
                     break;
             }
+            
             //停止位
-            dcb.StopBits = (BYTE) stopBits;
+            switch (stopBits) {
+                case 1:
+                    dcb.StopBits = ONESTOPBIT;
+                    break;
+                case 2:
+                    dcb.StopBits = TWOSTOPBITS;
+                    break;
+                default:
+                    dcb.StopBits = ONE5STOPBITS;
+            }
             //todo 通过flowCon 设置下面的
             dcb.fDtrControl = DTR_CONTROL_DISABLE;//DTR控制
             dcb.fRtsControl = RTS_CONTROL_DISABLE;//RTS控制
@@ -195,11 +228,6 @@ namespace c9 {
             PurgeComm(fd, PURGE_TXCLEAR | PURGE_RXCLEAR);
         }
 
-
-        if (fd == INVALID_HANDLE_VALUE) {
-            std::cerr << "INVALID FD" << std::endl;
-            return -1;
-        }
         return _open_osfhandle((intptr_t) fd, O_RDWR | flags);   //_get_osfhandle
     }
 
