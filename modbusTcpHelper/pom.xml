@@ -4,7 +4,7 @@
 
   <groupId>com.zhipuchina</groupId>
   <artifactId>modbusTcpHelper</artifactId>
-  <version>1.0.0-rc4</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>modbusTcpHelper</name>

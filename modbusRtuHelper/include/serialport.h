@@ -36,7 +36,7 @@ namespace c9{
          * @return 实际读取的大小
          */
         C9_EXPORTS ssize_t read(char * buffer ,uint32_t size) const;
-        C9_EXPORTS void read(std::function<void(std::string)> mCb);
+        C9_EXPORTS void read(const std::function<void(std::string)>& mCb) const;
 
         C9_EXPORTS void write(char* data,int size) const;
     private:

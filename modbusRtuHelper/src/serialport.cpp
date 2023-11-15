@@ -31,7 +31,7 @@ namespace c9 {
         OVERLAPPED m_osRead;
         memset(&m_osRead, 0, sizeof m_osRead);
         m_osRead.hEvent = CreateEventA(nullptr, TRUE, FALSE, "READ Event");
-        BOOL readStat = ReadFile((HANDLE) _get_osfhandle(fd), buffer, size, nullptr, &m_osRead);
+        BOOL readStat = ReadFile((HANDLE) _get_osfhandle(fd), buffer, size - 1, nullptr, &m_osRead);
         if (!readStat) {
             if (GetLastError() == ERROR_IO_PENDING) {
                 WaitForSingleObject(m_osRead.hEvent, INFINITE);
@@ -39,6 +39,7 @@ namespace c9 {
         }else {
             return EOF;
         }
+        buffer[m_osRead.InternalHigh] = 0;
         return m_osRead.InternalHigh;
     }
 
@@ -57,7 +58,9 @@ namespace c9 {
 
 #else
     ssize_t readSerial(int fd,char *buffer, uint32_t size) {
-        return ::read(fd,buffer,size);
+        ssize_t s = ::read(fd,buffer,size - 1);
+        buffer[s] = 0;
+        return s;
     }
 
     void writeSerial(int fd,char *data,int size)  {
@@ -66,9 +69,9 @@ namespace c9 {
 
 #endif
 
-    C9_EXPORTS void SerialPort::read(std::function<void(std::string)> mCb) {
+    C9_EXPORTS void SerialPort::read(const std::function<void(std::string)>& mCb) const {
         char *buffer = new char[3036];
-        while (read(buffer, 3036) != EOF) {
+        while (read(buffer, 3035) != EOF) {
             mCb(buffer);
         }
     }
@@ -116,7 +119,7 @@ namespace c9 {
             }
         }
 
-        fd = CreateFile(
+        fd = CreateFileA(
                 handleComStr(path).c_str(),
                 GENERIC_READ | GENERIC_WRITE | flags,
                 0,//禁止其他程序读写

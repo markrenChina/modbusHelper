@@ -19,7 +19,8 @@ int main(int argv,char* argc[]){
 //    c9::SerialPort serialPort("\\\\.\\COM22");
     c9::SerialPort serialPort("COM22");
     serialPort.open();
-    serialPort.write("hello world", sizeof("hello world"));
+    char cmd[] = {0x15, 0x02, 0x00, 0x17};
+    serialPort.write(cmd, 4);
 //    serialPort.read([](const std::string& data){
 //        std::cout << data << std::endl;
 //    });

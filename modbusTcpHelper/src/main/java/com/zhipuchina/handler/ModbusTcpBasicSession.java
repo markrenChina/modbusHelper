@@ -10,6 +10,7 @@ import com.zhipuchina.pojo.Exchange;
 import com.zhipuchina.utils.BitUtil;
 import com.zhipuchina.utils.ByteArrays;
 import com.zhipuchina.utils.ConvertTo;
+import com.zhipuchina.utils.InputStreamUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -123,7 +124,7 @@ public class ModbusTcpBasicSession implements Runnable {
         byte[] ADU;
         try {
             while (!socket.isClosed()) {
-                int readLen = in.readNBytes(header, 0, 7);
+                int readLen = InputStreamUtil.readNBytes(in, header, 0, 7);
                 if (readLen != 7) {
                     close();
                     break;
@@ -140,7 +141,7 @@ public class ModbusTcpBasicSession implements Runnable {
                 int frameLen = ((header[4] & 0xFF) << 8) | (header[5] & 0xFF);
                 GlobalLogger.logger.debug("frameLen " + frameLen);
                 ADU = new byte[frameLen - 1];
-                int len = in.readNBytes(ADU, 0, frameLen - 1);
+                int len = InputStreamUtil.readNBytes(in,ADU, 0, frameLen - 1);
                 if (len != frameLen - 1) {
                     GlobalLogger.logger.error("len != frameLen close accept ");
                     close();
