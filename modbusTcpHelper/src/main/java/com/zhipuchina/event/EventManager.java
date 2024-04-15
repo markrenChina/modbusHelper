@@ -27,9 +27,13 @@ public class EventManager {
     }
 
     public static void register(Integer key, AfterEventHandler handler) {
-        List<AfterEventHandler> events = aEvents.computeIfAbsent(key, k -> new ArrayList<>());
-        events.add(handler);
-        //System.out.println(events);
+        if (aEvents.containsKey(key)){
+            aEvents.get(key).add(handler);
+        }else {
+            List<AfterEventHandler> list = new ArrayList<>();
+            list.add(handler);
+            aEvents.put(key, list);
+        }
     }
 
     public static BeforeEventHandler getBeforeEvent(MemoryTypes type, int offset) {

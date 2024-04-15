@@ -6,8 +6,9 @@ import com.zhipuchina.model.MemoryTypes;
 import com.zhipuchina.pojo.Exchange;
 import com.zhipuchina.utils.ConvertTo;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+//import java.util.Arrays;
+//import java.util.stream.Collectors;
+
 
 public class ThreeClientFunctionHandler extends ClientFunctionTemplate {
 
@@ -20,6 +21,9 @@ public class ThreeClientFunctionHandler extends ClientFunctionTemplate {
             value[i] = ConvertTo.getInteger(ADU[2+i*2],ADU[3+i*2]);
         }
         Buffer.setValue(MemoryTypes.HoldingRegister, exchange.getAddress(), count, value);
-        exchange.getResult().addAll(Arrays.stream(value).boxed().collect(Collectors.toList()));
+        //exchange.getResult().addAll(Arrays.stream(value).boxed().collect(Collectors.toList()));
+        for (int obj : value) {
+            exchange.getResult().add(obj);
+        }
     }
 }

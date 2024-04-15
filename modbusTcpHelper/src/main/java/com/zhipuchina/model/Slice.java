@@ -49,6 +49,11 @@ public class Slice {
                 current = current.next;
                 return current;
             }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("remove");
+            }
         };
     }
 

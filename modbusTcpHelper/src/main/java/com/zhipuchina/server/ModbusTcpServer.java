@@ -3,15 +3,13 @@ package com.zhipuchina.server;
 import com.zhipuchina.exec.ModbusExecutors;
 import com.zhipuchina.handler.DefaultServerSessionFactoryImp;
 import com.zhipuchina.handler.GlobalLogger;
-import com.zhipuchina.handler.ModbusTcpBasicSession;
 import com.zhipuchina.handler.SessionFactory;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Objects;
 
 public class ModbusTcpServer extends TcpServer {
-    private SessionFactory factory;
+    private final SessionFactory factory;
 
     public ModbusTcpServer(InetAddress address, int port) {
         this(address, port,null);
@@ -19,7 +17,7 @@ public class ModbusTcpServer extends TcpServer {
 
     public ModbusTcpServer(InetAddress address, int port, SessionFactory factory) {
         super(address, port);
-        this.factory = Objects.requireNonNullElseGet(factory, DefaultServerSessionFactoryImp::new);
+        this.factory = factory == null ? new DefaultServerSessionFactoryImp() : factory;
     }
 
     @Override

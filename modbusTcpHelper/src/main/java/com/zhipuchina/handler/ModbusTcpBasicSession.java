@@ -15,7 +15,6 @@ import com.zhipuchina.utils.InputStreamUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
@@ -37,7 +36,7 @@ public class ModbusTcpBasicSession implements Runnable {
 
     public ModbusTcpBasicSession(Socket socket, Integer slaveId, FunctionController[] functionControllers) {
         this.socket = socket;
-        this.slaveId = Objects.requireNonNullElse(slaveId, 1);
+        this.slaveId = slaveId==null ? 1 : slaveId;
         this.isIgnoreSlaveId = (slaveId == null);
         this.functionControllers = functionControllers;
         try {

@@ -2,10 +2,9 @@ package com.zhipuchina.model;
 
 import com.zhipuchina.exception.ModbusException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class Memory{
     protected Slice head;
@@ -48,7 +47,12 @@ public abstract class Memory{
 
 
     public  List<Integer> getValueAsInt(int start, int count) throws ModbusException{
-        return Arrays.stream(getValue(start,count)).boxed().collect(Collectors.toList());
+//        return Arrays.stream(getValue(start,count)).boxed().collect(Collectors.toList());
+        List<Integer> res = new ArrayList<>(count);
+        for (int i : getValue(start, count)) {
+            res.add(i);
+        }
+        return res;
     }
 
     /**

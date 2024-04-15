@@ -1,8 +1,6 @@
 package com.zhipuchina.event;
 
-import com.zhipuchina.model.Memory;
-
-@FunctionalInterface
+//@FunctionalInterface
 public interface EventHandler {
     public void process();
 }
